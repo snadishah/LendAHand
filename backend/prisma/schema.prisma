@@ -1,0 +1,136 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// SQLite has no native enum support in Prisma, so these fields are plain
+// Strings validated by Zod at the API boundary. Allowed values:
+//   User.userType         "POSTER" | "HELPER"
+//   Task.status            "OPEN" | "IN_PROGRESS" | "DONE" | "CANCELLED"
+//   Bid.status              "PENDING" | "ACCEPTED" | "REJECTED"
+//   WalletTransaction.type "DEPOSIT" | "WITHDRAW" | "ESCROW_HOLD" | "ESCROW_RELEASE" | "REFUND"
+
+model User {
+  id            Int      @id @default(autoincrement())
+  name          String
+  email         String   @unique
+  passwordHash  String
+  userType      String
+  city          String?
+  phone         String?
+  walletBalance Float    @default(0)
+  createdAt     DateTime @default(now())
+
+  tasksPosted     Task[]              @relation("PosterTasks")
+  tasksHelping    Task[]              @relation("HelperTasks")
+  bids            Bid[]
+  reviewsWritten  Review[]            @relation("ReviewsWritten")
+  reviewsReceived Review[]            @relation("ReviewsReceived")
+  walletTxs       WalletTransaction[]
+  notifications   Notification[]
+  contactShares   ContactShare[]
+}
+
+model Category {
+  id    Int    @id @default(autoincrement())
+  name  String @unique
+  icon  String @default("📋")
+  tasks Task[]
+}
+
+model Task {
+  id             Int      @id @default(autoincrement())
+  posterId       Int
+  poster         User     @relation("PosterTasks", fields: [posterId], references: [id])
+  categoryId     Int
+  category       Category @relation(fields: [categoryId], references: [id])
+  title          String
+  description    String
+  address        String
+  latitude       Float?
+  longitude      Float?
+  budget         Float
+  status         String   @default("OPEN")
+  helperId       Int?
+  helper         User?    @relation("HelperTasks", fields: [helperId], references: [id])
+  acceptedAmount Float?
+  createdAt      DateTime @default(now())
+
+  bids          Bid[]
+  reviews       Review[]
+  contactShares ContactShare[]
+
+  @@index([status])
+  @@index([posterId])
+  @@index([helperId])
+}
+
+model Bid {
+  id             Int      @id @default(autoincrement())
+  taskId         Int
+  task           Task     @relation(fields: [taskId], references: [id])
+  helperId       Int
+  helper         User     @relation(fields: [helperId], references: [id])
+  proposedAmount Float
+  status         String   @default("PENDING")
+  createdAt      DateTime @default(now())
+
+  @@unique([taskId, helperId])
+  @@index([taskId])
+  @@index([helperId])
+}
+
+model Review {
+  id         Int      @id @default(autoincrement())
+  taskId     Int
+  task       Task     @relation(fields: [taskId], references: [id])
+  reviewerId Int
+  reviewer   User     @relation("ReviewsWritten", fields: [reviewerId], references: [id])
+  revieweeId Int
+  reviewee   User     @relation("ReviewsReceived", fields: [revieweeId], references: [id])
+  rating     Int
+  comment    String?
+  createdAt  DateTime @default(now())
+
+  @@unique([taskId, reviewerId])
+  @@index([revieweeId])
+}
+
+model WalletTransaction {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  type      String
+  amount    Float
+  note      String?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model Notification {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  message   String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([userId, isRead])
+}
+
+model ContactShare {
+  id        Int      @id @default(autoincrement())
+  taskId    Int
+  task      Task     @relation(fields: [taskId], references: [id])
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+
+  @@unique([taskId, userId])
+  @@index([taskId])
+}
