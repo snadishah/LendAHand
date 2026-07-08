@@ -3,11 +3,13 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-// SQLite has no native enum support in Prisma, so these fields are plain
+// Postgres does support native enums, but these fields were originally written
+// for SQLite (no enum support) and are still validated as plain strings by Zod
+// at the API boundary, so they're kept as strings for continuity. Allowed values:
 // Strings validated by Zod at the API boundary. Allowed values:
 //   User.userType         "POSTER" | "HELPER"
 //   Task.status            "OPEN" | "IN_PROGRESS" | "DONE" | "CANCELLED"
