@@ -8,6 +8,7 @@ ENV DATABASE_URL="postgresql://user:password@localhost:5432/db"
 
 COPY package*.json ./
 COPY backend/package.json backend/package.json
+COPY backend/prisma backend/prisma
 COPY frontend/package.json frontend/package.json
 RUN npm install
 
