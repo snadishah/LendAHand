@@ -52,6 +52,12 @@
   .chip-cancelled {
     @apply chip bg-red-100 text-red-500 dark:bg-red-950 dark:text-red-400;
   }
+  .chip-submitted {
+    @apply chip bg-teal/15 text-teal;
+  }
+  .chip-disputed {
+    @apply chip bg-orange/20 text-orange dark:text-orange;
+  }
 }
 
 @keyframes pulse-dot {

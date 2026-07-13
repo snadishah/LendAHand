@@ -6,6 +6,8 @@ import { signToken, AUTH_COOKIE_NAME, AUTH_COOKIE_MAX_AGE_MS } from "../lib/jwt.
 import { HttpError } from "../lib/httpError.js";
 import { asyncHandler } from "../lib/asyncHandler.js";
 import { requireAuth } from "../middleware/auth.js";
+import { authLimiter } from "../lib/rateLimit.js";
+import { isProduction } from "../env.js";
 import type { UserType } from "../types/domain.js";
 
 const router = Router();
@@ -30,12 +32,12 @@ function setAuthCookie(res: import("express").Response, token: string) {
   res.cookie(AUTH_COOKIE_NAME, token, {
     httpOnly: true,
     sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
+    secure: isProduction,
     maxAge: AUTH_COOKIE_MAX_AGE_MS,
   });
 }
 
-function publicUser(user: { id: number; name: string; email: string; userType: string; city: string | null; phone: string | null; walletBalance: number; createdAt: Date }) {
+function publicUser(user: { id: number; name: string; email: string; userType: string; city: string | null; phone: string | null; walletBalance: number; isAdmin: boolean; createdAt: Date }) {
   return {
     id: user.id,
     name: user.name,
@@ -44,12 +46,14 @@ function publicUser(user: { id: number; name: string; email: string; userType: s
     city: user.city,
     phone: user.phone,
     walletBalance: user.walletBalance,
+    isAdmin: user.isAdmin,
     createdAt: user.createdAt,
   };
 }
 
 router.post(
   "/register",
+  authLimiter,
   asyncHandler(async (req, res) => {
     const input = registerSchema.parse(req.body);
 
@@ -77,6 +81,7 @@ router.post(
 
 router.post(
   "/login",
+  authLimiter,
   asyncHandler(async (req, res) => {
     const input = loginSchema.parse(req.body);
 
@@ -85,6 +90,8 @@ router.post(
 
     const valid = await bcrypt.compare(input.password, user.passwordHash);
     if (!valid) throw new HttpError(401, "Invalid email or password");
+
+    if (user.isBanned) throw new HttpError(403, "Your account has been suspended.");
 
     const token = signToken({ id: user.id, userType: user.userType as UserType });
     setAuthCookie(res, token);

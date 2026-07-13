@@ -2,6 +2,7 @@ import { Router } from "express";
 import { z } from "zod";
 import { asyncHandler } from "../lib/asyncHandler.js";
 import { requireAuth, requireRole } from "../middleware/auth.js";
+import { prisma } from "../lib/prisma.js";
 import {
   createTask,
   listTasks,
@@ -9,23 +10,30 @@ import {
   getTasksForUser,
   getTaskById,
   cancelTask,
-  markTaskDone,
+  submitTask,
+  confirmTask,
 } from "../services/task.service.js";
 import { createBid, getBidsForTask, hasHelperBid } from "../services/bid.service.js";
 import { getContactStatus, shareContact } from "../services/contact.service.js";
+import { raiseDispute } from "../services/dispute.service.js";
+import { hasReviewed } from "../services/review.service.js";
 
 const router = Router();
 
 const createTaskSchema = z.object({
-  title: z.string().min(3),
-  description: z.string().min(10),
+  title: z.string().min(3).max(120),
+  description: z.string().min(10).max(4000),
   categoryId: z.number().int(),
-  address: z.string().min(3),
+  address: z.string().min(3).max(200),
   budget: z.number().positive(),
 });
 
 const createBidSchema = z.object({
   proposedAmount: z.number().positive(),
+});
+
+const disputeSchema = z.object({
+  reason: z.string().min(5).max(1000),
 });
 
 router.post(
@@ -75,14 +83,39 @@ router.get(
   requireAuth,
   asyncHandler(async (req, res) => {
     const id = Number(req.params.id);
+    const userId = req.user!.id;
     const task = await getTaskById(id);
 
-    const isOwner = task.posterId === req.user!.id;
-    const alreadyBid = req.user!.userType === "HELPER" ? await hasHelperBid(id, req.user!.id) : false;
+    const isOwner = task.posterId === userId;
+    const isHelper = task.helperId === userId;
+    const isParty = isOwner || isHelper;
+    const alreadyBid = req.user!.userType === "HELPER" ? await hasHelperBid(id, userId) : false;
     const isEligibleToBid =
       req.user!.userType === "HELPER" && task.status === "OPEN" && !isOwner && !alreadyBid;
 
-    res.json({ task, isOwner, isEligibleToBid, alreadyBid });
+    const reviewed = isParty && task.status === "DONE" ? await hasReviewed(id, userId) : false;
+    const openDispute =
+      isParty && task.status === "DISPUTED"
+        ? await prisma.dispute.findFirst({
+            where: { taskId: id, status: "OPEN" },
+            include: { raisedBy: { select: { id: true, name: true } } },
+          })
+        : null;
+
+    res.json({
+      task,
+      isOwner,
+      isHelper,
+      isEligibleToBid,
+      alreadyBid,
+      canSubmit: isHelper && task.status === "IN_PROGRESS",
+      canConfirm: isOwner && (task.status === "IN_PROGRESS" || task.status === "SUBMITTED"),
+      canCancel: isOwner && (task.status === "OPEN" || task.status === "IN_PROGRESS"),
+      canDispute: isParty && (task.status === "IN_PROGRESS" || task.status === "SUBMITTED"),
+      canReview: isParty && task.status === "DONE" && !reviewed,
+      hasReviewed: reviewed,
+      openDispute,
+    });
   })
 );
 
@@ -97,12 +130,32 @@ router.patch(
 );
 
 router.patch(
+  "/:id/submit",
+  requireAuth,
+  requireRole("HELPER"),
+  asyncHandler(async (req, res) => {
+    const task = await submitTask(Number(req.params.id), req.user!.id);
+    res.json({ task });
+  })
+);
+
+router.patch(
   "/:id/done",
   requireAuth,
   requireRole("POSTER"),
   asyncHandler(async (req, res) => {
-    const task = await markTaskDone(Number(req.params.id), req.user!.id);
+    const task = await confirmTask(Number(req.params.id), req.user!.id);
     res.json({ task });
+  })
+);
+
+router.post(
+  "/:id/dispute",
+  requireAuth,
+  asyncHandler(async (req, res) => {
+    const { reason } = disputeSchema.parse(req.body);
+    const dispute = await raiseDispute(Number(req.params.id), req.user!.id, reason);
+    res.status(201).json({ dispute });
   })
 );
 

@@ -3,6 +3,6 @@ builder = "dockerfile"
 dockerfilePath = "Dockerfile"
 
 [deploy]
-startCommand = "sh -c \"npx prisma migrate deploy --schema=backend/prisma/schema.prisma && node backend/dist/index.js\""
+startCommand = "sh -c \"npx prisma migrate deploy --schema=backend/prisma/schema.prisma && node --import ./backend/dist/instrument.js backend/dist/index.js\""
 restartPolicyType = "on_failure"
 restartPolicyMaxRetries = 3

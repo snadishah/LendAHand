@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import { useAuth } from "./context/AuthContext";
 import { ProtectedRoute } from "./components/layout/ProtectedRoute";
@@ -15,6 +16,13 @@ import { WalletPage } from "./pages/WalletPage";
 import { ChatPage } from "./pages/ChatPage";
 import { MapPage } from "./pages/MapPage";
 import { SettingsPage } from "./pages/SettingsPage";
+import { AdminPage } from "./pages/AdminPage";
+
+function AdminRoute({ children }: { children: ReactNode }) {
+  const { user } = useAuth();
+  if (!user?.isAdmin) return <Navigate to="/dashboard" replace />;
+  return <>{children}</>;
+}
 
 export default function App() {
   const { loading } = useAuth();
@@ -48,6 +56,7 @@ export default function App() {
         <Route path="/chat" element={<ChatPage />} />
         <Route path="/map" element={<MapPage />} />
         <Route path="/settings" element={<SettingsPage />} />
+        <Route path="/admin" element={<AdminRoute><AdminPage /></AdminRoute>} />
       </Route>
 
       <Route path="/" element={<Navigate to="/dashboard" replace />} />

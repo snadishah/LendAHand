@@ -1,7 +1,8 @@
 export type UserType = "POSTER" | "HELPER";
-export type TaskStatus = "OPEN" | "IN_PROGRESS" | "DONE" | "CANCELLED";
+export type TaskStatus = "OPEN" | "IN_PROGRESS" | "SUBMITTED" | "DONE" | "CANCELLED" | "DISPUTED";
 export type BidStatus = "PENDING" | "ACCEPTED" | "REJECTED";
 export type WalletTxType = "DEPOSIT" | "WITHDRAW" | "ESCROW_HOLD" | "ESCROW_RELEASE" | "REFUND";
+export type DisputeResolution = "RELEASED" | "REFUNDED";
 
 export interface User {
   id: number;
@@ -11,6 +12,7 @@ export interface User {
   city: string | null;
   phone: string | null;
   walletBalance: number;
+  isAdmin?: boolean;
   createdAt: string;
 }
 

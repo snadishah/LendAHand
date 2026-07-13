@@ -5,12 +5,12 @@ import { StarRating } from "../ui/StarRating";
 
 interface ReviewModalProps {
   taskId: number;
-  helperName: string;
+  revieweeName: string;
   onClose: () => void;
   onSubmitted: () => void;
 }
 
-export function ReviewModal({ taskId, helperName, onClose, onSubmitted }: ReviewModalProps) {
+export function ReviewModal({ taskId, revieweeName, onClose, onSubmitted }: ReviewModalProps) {
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -30,9 +30,9 @@ export function ReviewModal({ taskId, helperName, onClose, onSubmitted }: Review
   }
 
   return (
-    <Modal title={`Rate ${helperName} 🏁`} onClose={onClose}>
+    <Modal title={`Rate ${revieweeName} 🏁`} onClose={onClose}>
       <div className="space-y-4">
-        <p className="text-sm text-muted">Task marked as done! Let others know how it went.</p>
+        <p className="text-sm text-muted">Task complete! Let others know how it went.</p>
 
         {error && <div className="rounded-xl bg-red-50 dark:bg-red-950 text-red-600 dark:text-red-400 text-sm px-3 py-2">{error}</div>}
 

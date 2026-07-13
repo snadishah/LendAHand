@@ -1,4 +1,5 @@
 import jwt from "jsonwebtoken";
+import { env } from "../env.js";
 import type { UserType } from "../types/domain.js";
 
 export interface AuthTokenPayload {
@@ -6,17 +7,12 @@ export interface AuthTokenPayload {
   userType: UserType;
 }
 
-const JWT_SECRET = process.env.JWT_SECRET;
-if (!JWT_SECRET) {
-  throw new Error("JWT_SECRET environment variable is required");
-}
-
 export function signToken(payload: AuthTokenPayload): string {
-  return jwt.sign(payload, JWT_SECRET as string, { expiresIn: "7d" });
+  return jwt.sign(payload, env.JWT_SECRET, { expiresIn: "7d" });
 }
 
 export function verifyToken(token: string): AuthTokenPayload {
-  return jwt.verify(token, JWT_SECRET as string) as AuthTokenPayload;
+  return jwt.verify(token, env.JWT_SECRET) as AuthTokenPayload;
 }
 
 export const AUTH_COOKIE_NAME = "token";

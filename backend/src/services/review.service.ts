@@ -10,6 +10,13 @@ export async function getAverageRating(userId: number): Promise<{ average: numbe
   return { average: agg._avg.rating, count: agg._count.rating };
 }
 
+export async function hasReviewed(taskId: number, reviewerId: number): Promise<boolean> {
+  const existing = await prisma.review.findUnique({
+    where: { taskId_reviewerId: { taskId, reviewerId } },
+  });
+  return existing != null;
+}
+
 export async function getReviewsForUser(userId: number) {
   return prisma.review.findMany({
     where: { revieweeId: userId },
@@ -31,10 +38,17 @@ export async function createReview(reviewerId: number, input: CreateReviewInput)
 
   const task = await prisma.task.findUnique({ where: { id: input.taskId } });
   if (!task) throw new HttpError(404, "Task not found");
-  if (task.posterId !== reviewerId) throw new HttpError(403, "Only the task poster can leave this review");
   if (task.status !== "DONE" || !task.helperId) {
     throw new HttpError(400, "Task must be completed before it can be reviewed");
   }
+
+  // Either party on a completed task can review the other one time.
+  const isPoster = task.posterId === reviewerId;
+  const isHelper = task.helperId === reviewerId;
+  if (!isPoster && !isHelper) {
+    throw new HttpError(403, "Only the people involved in this task can review it");
+  }
+  const revieweeId = isPoster ? task.helperId : task.posterId;
 
   const existing = await prisma.review.findUnique({
     where: { taskId_reviewerId: { taskId: input.taskId, reviewerId } },
@@ -45,7 +59,7 @@ export async function createReview(reviewerId: number, input: CreateReviewInput)
     data: {
       taskId: input.taskId,
       reviewerId,
-      revieweeId: task.helperId,
+      revieweeId,
       rating: input.rating,
       comment: input.comment,
     },

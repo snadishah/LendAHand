@@ -20,7 +20,7 @@ const updatePasswordSchema = z.object({
   newPassword: z.string().min(6),
 });
 
-function publicUser(user: { id: number; name: string; email: string; userType: string; city: string | null; phone: string | null; walletBalance: number; createdAt: Date }) {
+function publicUser(user: { id: number; name: string; email: string; userType: string; city: string | null; phone: string | null; walletBalance: number; isAdmin: boolean; createdAt: Date }) {
   return {
     id: user.id,
     name: user.name,
@@ -29,6 +29,7 @@ function publicUser(user: { id: number; name: string; email: string; userType: s
     city: user.city,
     phone: user.phone,
     walletBalance: user.walletBalance,
+    isAdmin: user.isAdmin,
     createdAt: user.createdAt,
   };
 }

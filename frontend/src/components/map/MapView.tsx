@@ -9,8 +9,10 @@ const DEFAULT_CENTER: [number, number] = [31.5204, 74.3587]; // Lahore
 const STATUS_COLOR: Record<TaskStatus, string> = {
   OPEN: "#22C55E",
   IN_PROGRESS: "#FFD166",
+  SUBMITTED: "#2DD4BF",
   DONE: "#94A3B8",
   CANCELLED: "#EF4444",
+  DISPUTED: "#FB923C",
 };
 
 function pinIcon(color: string) {

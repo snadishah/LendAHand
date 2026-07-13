@@ -8,7 +8,7 @@ async function getTaskForContact(taskId: number, userId: number) {
   if (task.posterId !== userId && task.helperId !== userId) {
     throw new HttpError(403, "Not part of this task");
   }
-  if (task.status !== "IN_PROGRESS" && task.status !== "DONE") {
+  if (!["IN_PROGRESS", "SUBMITTED", "DONE", "DISPUTED"].includes(task.status)) {
     throw new HttpError(400, "Contact sharing is only available once a helper is assigned");
   }
   const otherUserId = task.posterId === userId ? task.helperId! : task.posterId;

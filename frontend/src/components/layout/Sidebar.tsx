@@ -26,6 +26,7 @@ export function Sidebar() {
     { to: "/map", label: "Full-Screen Map", short: "Map", icon: "🗺️" },
     { to: "/wallet", label: "My Wallet", short: "Wallet", icon: "💰" },
     { to: "/chat", label: "AI Chat Assistant", short: "Chat", icon: "🤖" },
+    ...(user?.isAdmin ? [{ to: "/admin", label: "Admin Console", short: "Admin", icon: "🛡️" }] : []),
   ];
 
   // Mobile bottom bar: every destination, in a compact scrollable row, so

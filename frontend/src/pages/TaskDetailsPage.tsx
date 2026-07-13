@@ -2,20 +2,36 @@ import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { apiGet, apiPatch, apiPost, ApiError } from "../lib/api";
 import { useAuth } from "../context/AuthContext";
-import type { Bid, ContactStatus, Task } from "../types";
+import type { Bid, ContactStatus, Task, TaskUserRef } from "../types";
 import { StatusChip } from "../components/ui/StatusChip";
 import { Spinner } from "../components/ui/EmptyState";
 import { Avatar } from "../components/ui/Avatar";
 import { PageHeader } from "../components/ui/PageHeader";
 import { BidCard } from "../components/tasks/BidCard";
 import { ReviewModal } from "../components/tasks/ReviewModal";
+import { Modal } from "../components/ui/Modal";
 import { MapView } from "../components/map/MapView";
+
+interface OpenDispute {
+  id: number;
+  reason: string;
+  createdAt: string;
+  raisedBy: TaskUserRef;
+}
 
 interface TaskDetailResponse {
   task: Task;
   isOwner: boolean;
+  isHelper: boolean;
   isEligibleToBid: boolean;
   alreadyBid: boolean;
+  canSubmit: boolean;
+  canConfirm: boolean;
+  canCancel: boolean;
+  canDispute: boolean;
+  canReview: boolean;
+  hasReviewed: boolean;
+  openDispute: OpenDispute | null;
 }
 
 export function TaskDetailsPage() {
@@ -33,6 +49,10 @@ export function TaskDetailsPage() {
   const [acceptingBidId, setAcceptingBidId] = useState<number | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
   const [showReview, setShowReview] = useState(false);
+
+  const [showDispute, setShowDispute] = useState(false);
+  const [disputeReason, setDisputeReason] = useState("");
+  const [submittingDispute, setSubmittingDispute] = useState(false);
 
   const [contact, setContact] = useState<ContactStatus | null>(null);
   const [sharingContact, setSharingContact] = useState(false);
@@ -58,7 +78,7 @@ export function TaskDetailsPage() {
   const contactEligible = !!(
     data &&
     user &&
-    (data.task.status === "IN_PROGRESS" || data.task.status === "DONE") &&
+    ["IN_PROGRESS", "SUBMITTED", "DONE", "DISPUTED"].includes(data.task.status) &&
     (data.isOwner || user.id === data.task.helperId)
   );
 
@@ -124,38 +144,53 @@ export function TaskDetailsPage() {
     }
   }
 
-  async function handleMarkDone() {
+  async function runAction(fn: () => Promise<unknown>, fallbackMsg: string, thenReview = false) {
     setActionLoading(true);
     setError(null);
     try {
-      await apiPatch(`/tasks/${id}/done`, {});
-      await load();
-      setShowReview(true);
+      await fn();
+      await Promise.all([load(), refreshUser()]);
+      if (thenReview) setShowReview(true);
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : "Couldn't mark this task as done.");
+      setError(err instanceof ApiError ? err.message : fallbackMsg);
     } finally {
       setActionLoading(false);
     }
   }
 
-  async function handleCancel() {
+  const handleSubmitWork = () =>
+    runAction(() => apiPatch(`/tasks/${id}/submit`, {}), "Couldn't submit your work.");
+  const handleConfirm = () =>
+    runAction(() => apiPatch(`/tasks/${id}/done`, {}), "Couldn't confirm this task.", true);
+
+  function handleCancel() {
     if (!confirm("Cancel this task? Any escrowed funds will be refunded to your wallet.")) return;
-    setActionLoading(true);
+    runAction(() => apiPatch(`/tasks/${id}/cancel`, {}), "Couldn't cancel this task.");
+  }
+
+  async function handleRaiseDispute(e: FormEvent) {
+    e.preventDefault();
+    if (disputeReason.trim().length < 5) return setError("Please describe the problem in a bit more detail.");
+    setSubmittingDispute(true);
     setError(null);
     try {
-      await apiPatch(`/tasks/${id}/cancel`, {});
-      await Promise.all([load(), refreshUser()]);
+      await apiPost(`/tasks/${id}/dispute`, { reason: disputeReason.trim() });
+      setShowDispute(false);
+      setDisputeReason("");
+      await load();
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : "Couldn't cancel this task.");
+      setError(err instanceof ApiError ? err.message : "Couldn't open a dispute.");
     } finally {
-      setActionLoading(false);
+      setSubmittingDispute(false);
     }
   }
 
   if (loading || !data) return <Spinner />;
 
-  const { task, isOwner, isEligibleToBid, alreadyBid } = data;
+  const { task, isOwner, isEligibleToBid, alreadyBid, canSubmit, canConfirm, canCancel, canDispute, canReview, hasReviewed, openDispute } = data;
   const anyBidAccepted = bids.some((b) => b.status === "ACCEPTED");
+  const revieweeName = isOwner ? task.helper?.name ?? "the helper" : task.poster.name;
+  const hasPartyActions = canSubmit || canConfirm || canCancel || canDispute || canReview || hasReviewed;
 
   return (
     <div className="space-y-5 max-w-4xl">
@@ -206,6 +241,20 @@ export function TaskDetailsPage() {
           </div>
         )}
       </div>
+
+      {task.status === "DISPUTED" && (
+        <div className="card p-5 space-y-1 border-orange/30 bg-orange/5">
+          <p className="font-bold">⚖️ This task is under dispute</p>
+          <p className="text-sm text-muted">
+            Our team will review it and release or refund the escrowed payment. The task is frozen until then.
+          </p>
+          {openDispute && (
+            <p className="text-sm mt-1">
+              <span className="text-muted">Raised by {openDispute.raisedBy.name}:</span> “{openDispute.reason}”
+            </p>
+          )}
+        </div>
+      )}
 
       {contactEligible && (
         <div className="card p-5 space-y-3">
@@ -258,39 +307,63 @@ export function TaskDetailsPage() {
         </div>
       )}
 
-      {isOwner && (
-        <div className="card p-5 space-y-4">
+      {hasPartyActions && (
+        <div className="card p-5 space-y-3">
+          {canSubmit && (
+            <p className="text-sm text-muted">Finished the work? Mark it as done and the poster will confirm to release your payment.</p>
+          )}
+          {canConfirm && task.status === "SUBMITTED" && (
+            <p className="text-sm text-muted">The helper marked this as done. Confirm to release the escrowed payment.</p>
+          )}
           <div className="flex flex-wrap gap-2">
-            {task.status === "IN_PROGRESS" && (
-              <button onClick={handleMarkDone} disabled={actionLoading} className="btn-primary">
-                🏁 Mark as Done
+            {canSubmit && (
+              <button onClick={handleSubmitWork} disabled={actionLoading} className="btn-primary">
+                ✅ Mark Work as Done
               </button>
             )}
-            {(task.status === "OPEN" || task.status === "IN_PROGRESS") && (
+            {canConfirm && (
+              <button onClick={handleConfirm} disabled={actionLoading} className="btn-primary">
+                🏁 Confirm & Release Payment
+              </button>
+            )}
+            {canReview && (
+              <button onClick={() => setShowReview(true)} disabled={actionLoading} className="btn-primary">
+                ⭐ Leave a Review
+              </button>
+            )}
+            {canDispute && (
+              <button onClick={() => setShowDispute(true)} disabled={actionLoading} className="btn-secondary">
+                ⚖️ Open a Dispute
+              </button>
+            )}
+            {canCancel && (
               <button onClick={handleCancel} disabled={actionLoading} className="btn-ghost-danger">
                 Cancel Task
               </button>
             )}
+            {hasReviewed && <span className="text-sm text-green font-medium self-center">✓ You've reviewed this task</span>}
           </div>
+        </div>
+      )}
 
-          <div>
-            <p className="font-bold mb-3">Received Bids {bids.length > 0 && `(${bids.length})`}</p>
-            {bids.length === 0 ? (
-              <p className="text-sm text-muted">No bids yet — check back soon.</p>
-            ) : (
-              <div className="space-y-3">
-                {bids.map((bid) => (
-                  <BidCard
-                    key={bid.id}
-                    bid={bid}
-                    disabled={anyBidAccepted || task.status !== "OPEN"}
-                    accepting={acceptingBidId === bid.id}
-                    onAccept={() => handleAccept(bid.id)}
-                  />
-                ))}
-              </div>
-            )}
-          </div>
+      {isOwner && (
+        <div className="card p-5 space-y-4">
+          <p className="font-bold">Received Bids {bids.length > 0 && `(${bids.length})`}</p>
+          {bids.length === 0 ? (
+            <p className="text-sm text-muted">No bids yet — check back soon.</p>
+          ) : (
+            <div className="space-y-3">
+              {bids.map((bid) => (
+                <BidCard
+                  key={bid.id}
+                  bid={bid}
+                  disabled={anyBidAccepted || task.status !== "OPEN"}
+                  accepting={acceptingBidId === bid.id}
+                  onAccept={() => handleAccept(bid.id)}
+                />
+              ))}
+            </div>
+          )}
         </div>
       )}
 
@@ -318,17 +391,41 @@ export function TaskDetailsPage() {
         <div className="card p-5 text-sm text-muted">✅ You've already placed a bid on this task.</div>
       )}
 
-      {user?.userType === "HELPER" && task.helperId === user.id && task.status === "IN_PROGRESS" && (
-        <div className="card p-5 text-sm">🚧 You're working on this task — the poster will mark it done once you finish.</div>
-      )}
-
-      {showReview && task.helper && (
+      {showReview && (
         <ReviewModal
           taskId={task.id}
-          helperName={task.helper.name}
+          revieweeName={revieweeName}
           onClose={() => setShowReview(false)}
-          onSubmitted={() => setShowReview(false)}
+          onSubmitted={() => {
+            setShowReview(false);
+            load();
+          }}
         />
+      )}
+
+      {showDispute && (
+        <Modal title="Open a Dispute ⚖️" onClose={() => setShowDispute(false)}>
+          <form onSubmit={handleRaiseDispute} className="space-y-4">
+            <p className="text-sm text-muted">
+              Tell us what went wrong. The task will be frozen and our team will review it, then release or refund the payment.
+            </p>
+            <textarea
+              className="input-field resize-none"
+              rows={4}
+              placeholder="Describe the problem..."
+              value={disputeReason}
+              onChange={(e) => setDisputeReason(e.target.value)}
+            />
+            <div className="flex gap-2">
+              <button type="button" onClick={() => setShowDispute(false)} className="btn-secondary flex-1">
+                Cancel
+              </button>
+              <button type="submit" disabled={submittingDispute} className="btn-primary flex-1">
+                {submittingDispute ? "Submitting..." : "Submit Dispute"}
+              </button>
+            </div>
+          </form>
+        </Modal>
       )}
     </div>
   );

@@ -12,9 +12,11 @@ datasource db {
 // at the API boundary, so they're kept as strings for continuity. Allowed values:
 // Strings validated by Zod at the API boundary. Allowed values:
 //   User.userType         "POSTER" | "HELPER"
-//   Task.status            "OPEN" | "IN_PROGRESS" | "DONE" | "CANCELLED"
+//   Task.status            "OPEN" | "IN_PROGRESS" | "SUBMITTED" | "DONE" | "CANCELLED" | "DISPUTED"
 //   Bid.status              "PENDING" | "ACCEPTED" | "REJECTED"
 //   WalletTransaction.type "DEPOSIT" | "WITHDRAW" | "ESCROW_HOLD" | "ESCROW_RELEASE" | "REFUND"
+//   Dispute.status         "OPEN" | "RESOLVED"
+//   Dispute.resolution     "RELEASED" | "REFUNDED"
 
 model User {
   id            Int      @id @default(autoincrement())
@@ -25,16 +27,20 @@ model User {
   city          String?
   phone         String?
   walletBalance Float    @default(0)
+  isAdmin       Boolean  @default(false)
+  isBanned      Boolean  @default(false)
   createdAt     DateTime @default(now())
 
-  tasksPosted     Task[]              @relation("PosterTasks")
-  tasksHelping    Task[]              @relation("HelperTasks")
-  bids            Bid[]
-  reviewsWritten  Review[]            @relation("ReviewsWritten")
-  reviewsReceived Review[]            @relation("ReviewsReceived")
-  walletTxs       WalletTransaction[]
-  notifications   Notification[]
-  contactShares   ContactShare[]
+  tasksPosted      Task[]              @relation("PosterTasks")
+  tasksHelping     Task[]              @relation("HelperTasks")
+  bids             Bid[]
+  reviewsWritten   Review[]            @relation("ReviewsWritten")
+  reviewsReceived  Review[]            @relation("ReviewsReceived")
+  walletTxs        WalletTransaction[]
+  notifications    Notification[]
+  contactShares    ContactShare[]
+  disputesRaised   Dispute[]           @relation("DisputesRaised")
+  disputesResolved Dispute[]           @relation("DisputesResolved")
 }
 
 model Category {
@@ -60,15 +66,36 @@ model Task {
   helperId       Int?
   helper         User?    @relation("HelperTasks", fields: [helperId], references: [id])
   acceptedAmount Float?
+  submittedAt    DateTime?
   createdAt      DateTime @default(now())
 
   bids          Bid[]
   reviews       Review[]
   contactShares ContactShare[]
+  disputes      Dispute[]
 
   @@index([status])
   @@index([posterId])
   @@index([helperId])
+}
+
+model Dispute {
+  id           Int       @id @default(autoincrement())
+  taskId       Int
+  task         Task      @relation(fields: [taskId], references: [id])
+  raisedById   Int
+  raisedBy     User      @relation("DisputesRaised", fields: [raisedById], references: [id])
+  reason       String
+  status       String    @default("OPEN")
+  resolution   String?
+  note         String?
+  resolvedById Int?
+  resolvedBy   User?     @relation("DisputesResolved", fields: [resolvedById], references: [id])
+  createdAt    DateTime  @default(now())
+  resolvedAt   DateTime?
+
+  @@index([status])
+  @@index([taskId])
 }
 
 model Bid {
