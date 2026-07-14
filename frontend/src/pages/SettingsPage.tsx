@@ -25,6 +25,19 @@ export function SettingsPage() {
   const [passwordSuccess, setPasswordSuccess] = useState<string | null>(null);
   const [savingPassword, setSavingPassword] = useState(false);
 
+  const emailsOn = !(user?.emailOptOut ?? false);
+  const [savingEmailPref, setSavingEmailPref] = useState(false);
+
+  async function toggleEmailPref() {
+    setSavingEmailPref(true);
+    try {
+      await apiPatch("/users/me", { emailOptOut: emailsOn });
+      await refreshUser();
+    } finally {
+      setSavingEmailPref(false);
+    }
+  }
+
   async function handleSaveProfile(e: FormEvent) {
     e.preventDefault();
     setProfileError(null);
@@ -191,6 +204,32 @@ export function SettingsPage() {
           <span
             className={`absolute top-1 left-1 h-5 w-5 rounded-full bg-white shadow transition-transform ${
               dark ? "translate-x-5" : ""
+            }`}
+          />
+        </button>
+      </div>
+
+      <div className="card p-5 flex items-center justify-between gap-4">
+        <div>
+          <p className="font-bold">✉️ Email Notifications</p>
+          <p className="text-sm text-muted">
+            Get occasional emails like review requests and tips. Important account and task emails are always sent.
+          </p>
+        </div>
+        <button
+          type="button"
+          role="switch"
+          aria-checked={emailsOn}
+          aria-label="Toggle non-essential emails"
+          disabled={savingEmailPref}
+          onClick={toggleEmailPref}
+          className={`relative h-7 w-12 shrink-0 rounded-full transition-colors ${
+            emailsOn ? "bg-coral" : "bg-slate-300 dark:bg-slate-600"
+          }`}
+        >
+          <span
+            className={`absolute top-1 left-1 h-5 w-5 rounded-full bg-white shadow transition-transform ${
+              emailsOn ? "translate-x-5" : ""
             }`}
           />
         </button>

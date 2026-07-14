@@ -6,6 +6,7 @@ import { HttpError } from "../lib/httpError.js";
 import { asyncHandler } from "../lib/asyncHandler.js";
 import { requireAuth } from "../middleware/auth.js";
 import { getAverageRating, getReviewsForUser } from "../services/review.service.js";
+import { verifyUnsubscribeToken } from "../services/email.service.js";
 
 const router = Router();
 
@@ -13,6 +14,7 @@ const updateMeSchema = z.object({
   name: z.string().min(3).optional(),
   city: z.string().optional(),
   phone: z.string().optional(),
+  emailOptOut: z.boolean().optional(),
 });
 
 const updatePasswordSchema = z.object({
@@ -20,7 +22,7 @@ const updatePasswordSchema = z.object({
   newPassword: z.string().min(6),
 });
 
-function publicUser(user: { id: number; name: string; email: string; userType: string; city: string | null; phone: string | null; walletBalance: number; isAdmin: boolean; createdAt: Date }) {
+function publicUser(user: { id: number; name: string; email: string; userType: string; city: string | null; phone: string | null; walletBalance: number; isAdmin: boolean; emailVerified: boolean; emailOptOut: boolean; createdAt: Date }) {
   return {
     id: user.id,
     name: user.name,
@@ -30,6 +32,8 @@ function publicUser(user: { id: number; name: string; email: string; userType: s
     phone: user.phone,
     walletBalance: user.walletBalance,
     isAdmin: user.isAdmin,
+    emailVerified: user.emailVerified,
+    emailOptOut: user.emailOptOut,
     createdAt: user.createdAt,
   };
 }
@@ -45,9 +49,24 @@ router.patch(
         ...(input.name !== undefined ? { name: input.name } : {}),
         ...(input.city !== undefined ? { city: input.city } : {}),
         ...(input.phone !== undefined ? { phone: input.phone } : {}),
+        ...(input.emailOptOut !== undefined ? { emailOptOut: input.emailOptOut } : {}),
       },
     });
     res.json({ user: publicUser(user) });
+  })
+);
+
+const unsubscribeSchema = z.object({ token: z.string().min(1) });
+
+// One-click unsubscribe from a signed email link — no login required.
+router.post(
+  "/unsubscribe",
+  asyncHandler(async (req, res) => {
+    const { token } = unsubscribeSchema.parse(req.body);
+    const userId = verifyUnsubscribeToken(token);
+    if (!userId) throw new HttpError(400, "This unsubscribe link is invalid.");
+    await prisma.user.update({ where: { id: userId }, data: { emailOptOut: true } });
+    res.json({ ok: true });
   })
 );
 

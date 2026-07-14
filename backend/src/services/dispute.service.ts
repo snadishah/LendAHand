@@ -1,7 +1,10 @@
 import { prisma } from "../lib/prisma.js";
 import { HttpError } from "../lib/httpError.js";
+import { env } from "../env.js";
 import { notify } from "./notification.service.js";
 import { releaseEscrowToHelper } from "./task.service.js";
+import { queueUserEmail } from "./email.service.js";
+import { disputeOpenedEmail, disputeResolvedEmail } from "../lib/emailTemplates.js";
 import type { DisputeResolution } from "../types/domain.js";
 
 const disputeInclude = {
@@ -34,6 +37,9 @@ export async function raiseDispute(taskId: number, userId: number, reason: strin
     const otherId = task.posterId === userId ? task.helperId : task.posterId;
     if (otherId) {
       await notify(tx, otherId, `A dispute was opened on "${task.title}". Our team will review it.`);
+      await queueUserEmail(tx, otherId, (u) =>
+        disputeOpenedEmail(u.name, task.title, `${env.APP_URL}/tasks/${task.id}`)
+      );
     }
 
     return dispute;
@@ -88,8 +94,13 @@ export async function resolveDispute(
       resolution === "RELEASED"
         ? `The dispute on "${task.title}" was resolved: payment released to the helper.`
         : `The dispute on "${task.title}" was resolved: the poster was refunded.`;
+    const released = resolution === "RELEASED";
     await notify(tx, task.posterId, outcomeMsg);
-    if (task.helperId) await notify(tx, task.helperId, outcomeMsg);
+    await queueUserEmail(tx, task.posterId, (u) => disputeResolvedEmail(u.name, task.title, released));
+    if (task.helperId) {
+      await notify(tx, task.helperId, outcomeMsg);
+      await queueUserEmail(tx, task.helperId, (u) => disputeResolvedEmail(u.name, task.title, released));
+    }
 
     return tx.dispute.update({
       where: { id: disputeId },

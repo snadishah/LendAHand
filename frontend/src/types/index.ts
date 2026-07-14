@@ -13,6 +13,8 @@ export interface User {
   phone: string | null;
   walletBalance: number;
   isAdmin?: boolean;
+  emailVerified?: boolean;
+  emailOptOut?: boolean;
   createdAt: string;
 }
 

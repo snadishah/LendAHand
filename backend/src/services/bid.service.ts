@@ -1,7 +1,10 @@
 import { prisma } from "../lib/prisma.js";
 import { HttpError } from "../lib/httpError.js";
+import { env } from "../env.js";
 import { getAverageRating } from "./review.service.js";
 import { notify } from "./notification.service.js";
+import { queueUserEmail } from "./email.service.js";
+import { bidAcceptedEmail } from "../lib/emailTemplates.js";
 
 export async function createBid(taskId: number, helperId: number, proposedAmount: number) {
   if (proposedAmount <= 0) throw new HttpError(400, "Bid amount must be positive");
@@ -105,6 +108,9 @@ export async function acceptBid(bidId: number, posterId: number) {
     });
 
     await notify(tx, bid.helperId, `Your bid on "${task.title}" was accepted! Time to get started.`);
+    await queueUserEmail(tx, bid.helperId, (u) =>
+      bidAcceptedEmail(u.name, task.title, bid.proposedAmount, `${env.APP_URL}/tasks/${bid.taskId}`)
+    );
     for (const other of rejected) {
       await notify(tx, other.helperId, `Your bid on "${task.title}" was not selected.`);
     }

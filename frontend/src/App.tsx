@@ -17,6 +17,7 @@ import { ChatPage } from "./pages/ChatPage";
 import { MapPage } from "./pages/MapPage";
 import { SettingsPage } from "./pages/SettingsPage";
 import { AdminPage } from "./pages/AdminPage";
+import { VerifyEmailPage, ForgotPasswordPage, ResetPasswordPage, UnsubscribePage } from "./pages/EmailActionPages";
 
 function AdminRoute({ children }: { children: ReactNode }) {
   const { user } = useAuth();
@@ -39,6 +40,10 @@ export default function App() {
     <Routes>
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
+      <Route path="/verify-email" element={<VerifyEmailPage />} />
+      <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+      <Route path="/reset-password" element={<ResetPasswordPage />} />
+      <Route path="/unsubscribe" element={<UnsubscribePage />} />
 
       <Route
         element={

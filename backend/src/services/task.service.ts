@@ -1,9 +1,12 @@
 import type { Prisma } from "@prisma/client";
 import { prisma } from "../lib/prisma.js";
 import { HttpError } from "../lib/httpError.js";
+import { env } from "../env.js";
 import { geocodeAddress } from "../lib/geocode.js";
 import { haversineDistanceKm } from "../lib/distance.js";
 import { notify } from "./notification.service.js";
+import { queueUserEmail } from "./email.service.js";
+import { workSubmittedEmail, paymentReleasedEmail, reviewRequestEmail } from "../lib/emailTemplates.js";
 
 const taskInclude = {
   category: true,
@@ -154,6 +157,9 @@ export async function submitTask(taskId: number, helperId: number) {
       task.posterId,
       `${task.title}: the helper marked the work as done. Please review and confirm to release payment.`
     );
+    await queueUserEmail(tx, task.posterId, (u) =>
+      workSubmittedEmail(u.name, task.title, `${env.APP_URL}/tasks/${taskId}`)
+    );
 
     return tx.task.update({
       where: { id: taskId },
@@ -178,6 +184,10 @@ export async function confirmTask(taskId: number, posterId: number) {
     }
 
     await releaseEscrowToHelper(tx, task.id, task.helperId, task.acceptedAmount, task.title);
+
+    const reviewLink = `${env.APP_URL}/tasks/${taskId}`;
+    await queueUserEmail(tx, task.posterId, (u) => reviewRequestEmail(u.name, task.title, reviewLink, u.unsubscribeUrl));
+    await queueUserEmail(tx, task.helperId, (u) => reviewRequestEmail(u.name, task.title, reviewLink, u.unsubscribeUrl));
 
     return tx.task.update({
       where: { id: taskId },
@@ -244,4 +254,5 @@ export async function releaseEscrowToHelper(
       ? `You've been auto-paid Rs. ${amount} for "${title}" (the poster didn't confirm in time).`
       : `You've been paid Rs. ${amount} for completing "${title}"!`
   );
+  await queueUserEmail(tx, helperId, (u) => paymentReleasedEmail(u.name, title, amount, auto));
 }
