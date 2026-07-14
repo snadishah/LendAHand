@@ -1,18 +1,33 @@
-import { Resend } from "resend";
+import nodemailer, { type Transporter } from "nodemailer";
 import { env } from "../env.js";
 
-// Email delivery is a no-op until RESEND_API_KEY is configured, so the app runs
-// identically in development and won't break if email isn't set up yet.
-let client: Resend | null = null;
+// Email delivery via Gmail SMTP. It's a no-op until GMAIL_USER +
+// GMAIL_APP_PASSWORD are configured, so the app runs identically in
+// development and won't break if email isn't set up yet.
+//
+// Note: Gmail free accounts cap at ~500 emails/day. When moving to a custom
+// domain later, only this file (and the env vars) need to change.
+let transporter: Transporter | null = null;
 
 export function isEmailConfigured(): boolean {
-  return !!env.RESEND_API_KEY;
+  return !!(env.GMAIL_USER && env.GMAIL_APP_PASSWORD);
 }
 
-function getClient(): Resend | null {
-  if (!env.RESEND_API_KEY) return null;
-  if (!client) client = new Resend(env.RESEND_API_KEY);
-  return client;
+function getTransporter(): Transporter | null {
+  if (!isEmailConfigured()) return null;
+  if (!transporter) {
+    transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: { user: env.GMAIL_USER, pass: env.GMAIL_APP_PASSWORD },
+    });
+  }
+  return transporter;
+}
+
+// Gmail requires the From address to be the authenticated account (a display
+// name is fine). Fall back to that if EMAIL_FROM isn't set.
+function fromAddress(): string {
+  return env.EMAIL_FROM || `LendAHand <${env.GMAIL_USER}>`;
 }
 
 export interface OutgoingEmail {
@@ -23,18 +38,17 @@ export interface OutgoingEmail {
 }
 
 export async function sendEmail(email: OutgoingEmail): Promise<{ ok: boolean; error?: string }> {
-  const resend = getClient();
-  if (!resend) return { ok: false, error: "Email not configured" };
+  const tx = getTransporter();
+  if (!tx) return { ok: false, error: "Email not configured" };
 
   try {
-    const { error } = await resend.emails.send({
-      from: env.EMAIL_FROM,
+    await tx.sendMail({
+      from: fromAddress(),
       to: email.to,
       subject: email.subject,
       html: email.html,
-      text: email.text ?? undefined,
+      text: email.text,
     });
-    if (error) return { ok: false, error: error.message };
     return { ok: true };
   } catch (err) {
     return { ok: false, error: err instanceof Error ? err.message : "Unknown email error" };
