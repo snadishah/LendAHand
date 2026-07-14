@@ -7,12 +7,12 @@ import type { Task, TaskStatus } from "../../types";
 const DEFAULT_CENTER: [number, number] = [31.5204, 74.3587]; // Lahore
 
 const STATUS_COLOR: Record<TaskStatus, string> = {
-  OPEN: "#22C55E",
-  IN_PROGRESS: "#FFD166",
-  SUBMITTED: "#2DD4BF",
-  DONE: "#94A3B8",
-  CANCELLED: "#EF4444",
-  DISPUTED: "#FB923C",
+  OPEN: "#0A0A0A",
+  IN_PROGRESS: "#595959",
+  SUBMITTED: "#2E2E2E",
+  DONE: "#AEAAA1",
+  CANCELLED: "#D0CDC4",
+  DISPUTED: "#7A756B",
 };
 
 function pinIcon(color: string) {
@@ -32,7 +32,7 @@ function pinIcon(color: string) {
 const meIcon = L.divIcon({
   className: "",
   html: `<div class="you-are-here-dot" style="
-    width:16px;height:16px;border-radius:50%;background:#FF6B6B;border:3px solid white;
+    width:16px;height:16px;border-radius:50%;background:#0A0A0A;border:3px solid white;
   "></div>`,
   iconSize: [16, 16],
   iconAnchor: [8, 8],

@@ -9,8 +9,8 @@ interface NavItem {
 }
 
 const linkBase =
-  "flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium text-navy dark:text-slate-200 hover:bg-[#F7F6F2] dark:hover:bg-slate-700 transition-colors";
-const linkActive = "bg-coral/10 text-coral dark:bg-coral/20 dark:text-coral font-semibold";
+  "flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium text-navy dark:text-slate-200 hover:bg-ink/5 dark:hover:bg-white/10 transition-colors";
+const linkActive = "bg-ink/10 text-ink dark:bg-white/15 dark:text-white font-semibold";
 
 const SETTINGS_LINK: NavItem = { to: "/settings", label: "Settings", short: "Settings", icon: "⚙️" };
 
@@ -36,7 +36,7 @@ export function Sidebar() {
   return (
     <>
       {/* Desktop sidebar */}
-      <aside className="hidden sm:flex w-60 shrink-0 flex-col gap-1 p-3 bg-white dark:bg-slate-800 border-r border-[#E8E8E8] dark:border-slate-700 sm:sticky sm:top-[61px] sm:h-[calc(100vh-61px)] overflow-y-auto">
+      <aside className="hidden sm:flex w-60 shrink-0 flex-col gap-1 p-3 bg-paper dark:bg-[#0B0B0B] border-r border-ink/10 dark:border-white/10 sm:sticky sm:top-[61px] sm:h-[calc(100vh-61px)] overflow-y-auto">
         {links.map((link) => (
           <NavLink
             key={link.to}
@@ -48,7 +48,7 @@ export function Sidebar() {
           </NavLink>
         ))}
 
-        <div className="mt-auto pt-2 border-t border-[#E8E8E8] dark:border-slate-700">
+        <div className="mt-auto pt-2 border-t border-ink/10 dark:border-white/10">
           <NavLink
             to={SETTINGS_LINK.to}
             className={({ isActive }) => `${linkBase} ${isActive ? linkActive : ""} whitespace-nowrap`}
@@ -60,14 +60,14 @@ export function Sidebar() {
       </aside>
 
       {/* Mobile bottom tab bar */}
-      <nav className="fixed bottom-0 inset-x-0 z-40 sm:hidden flex overflow-x-auto bg-white dark:bg-slate-800 border-t border-[#E8E8E8] dark:border-slate-700 pb-[env(safe-area-inset-bottom)]">
+      <nav className="fixed bottom-0 inset-x-0 z-40 sm:hidden flex overflow-x-auto bg-paper dark:bg-[#0B0B0B] border-t border-ink/10 dark:border-white/10 pb-[env(safe-area-inset-bottom)]">
         {mobileLinks.map((link) => (
           <NavLink
             key={link.to}
             to={link.to}
             className={({ isActive }) =>
               `flex-1 min-w-[64px] flex flex-col items-center gap-0.5 py-2 text-[11px] font-semibold whitespace-nowrap transition-colors ${
-                isActive ? "text-coral" : "text-muted"
+                isActive ? "text-ink dark:text-white" : "text-muted"
               }`
             }
           >

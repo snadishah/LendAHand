@@ -61,8 +61,8 @@ export function Navbar() {
   }
 
   return (
-    <header className="sticky top-0 z-40 flex items-center justify-between gap-4 border-b border-[#E8E8E8] dark:border-slate-700 bg-white/90 dark:bg-slate-800/90 backdrop-blur px-4 sm:px-6 py-3">
-      <Link to="/dashboard" className="flex items-center gap-2 font-extrabold text-lg shrink-0">
+    <header className="sticky top-0 z-40 flex items-center justify-between gap-4 border-b border-ink/10 dark:border-white/10 bg-paper/80 dark:bg-[#0B0B0B]/80 backdrop-blur px-4 sm:px-6 py-3">
+      <Link to="/dashboard" className="flex items-center gap-2 font-display font-bold text-lg shrink-0">
         <span className="text-2xl">🤝</span>
         <span className="hidden sm:inline">LendAHand</span>
       </Link>
@@ -78,7 +78,7 @@ export function Navbar() {
         <div className="relative" ref={bellRef}>
           <button
             onClick={() => setShowBell((s) => !s)}
-            className="relative rounded-full h-9 w-9 flex items-center justify-center hover:bg-[#F7F6F2] dark:hover:bg-slate-700 transition-colors"
+            className="relative rounded-full h-9 w-9 flex items-center justify-center hover:bg-ink/5 dark:hover:bg-white/10 transition-colors"
             aria-label="Notifications"
           >
             🔔
@@ -125,7 +125,7 @@ export function Navbar() {
 
         <button
           onClick={toggle}
-          className="rounded-full h-9 w-9 flex items-center justify-center hover:bg-[#F7F6F2] dark:hover:bg-slate-700 transition-colors"
+          className="rounded-full h-9 w-9 flex items-center justify-center hover:bg-ink/5 dark:hover:bg-white/10 transition-colors"
           aria-label="Toggle dark mode"
         >
           {dark ? "☀️" : "🌙"}

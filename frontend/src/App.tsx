@@ -17,6 +17,7 @@ import { ChatPage } from "./pages/ChatPage";
 import { MapPage } from "./pages/MapPage";
 import { SettingsPage } from "./pages/SettingsPage";
 import { AdminPage } from "./pages/AdminPage";
+import { LandingPage } from "./pages/LandingPage";
 import { VerifyEmailPage, ForgotPasswordPage, ResetPasswordPage, UnsubscribePage } from "./pages/EmailActionPages";
 
 function AdminRoute({ children }: { children: ReactNode }) {
@@ -38,6 +39,7 @@ export default function App() {
 
   return (
     <Routes>
+      <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/verify-email" element={<VerifyEmailPage />} />
@@ -64,8 +66,7 @@ export default function App() {
         <Route path="/admin" element={<AdminRoute><AdminPage /></AdminRoute>} />
       </Route>
 
-      <Route path="/" element={<Navigate to="/dashboard" replace />} />
-      <Route path="*" element={<Navigate to="/dashboard" replace />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }
