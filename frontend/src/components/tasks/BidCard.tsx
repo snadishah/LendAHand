@@ -24,7 +24,7 @@ export function BidCard({ bid, disabled, onAccept, accepting }: BidCardProps) {
           <p className="font-semibold truncate">{bid.helper.name}</p>
           {bid.helperRating && <StarRating rating={bid.helperRating.average ?? 0} count={bid.helperRating.count} />}
           <p className="text-sm text-muted mt-1">
-            Bid: <span className="font-bold text-navy dark:text-slate-100">Rs. {bid.proposedAmount.toFixed(0)}</span>
+            Bid: <span className="font-bold text-navy dark:text-[#EDEBE4]">Rs. {bid.proposedAmount.toFixed(0)}</span>
           </p>
         </div>
       </div>

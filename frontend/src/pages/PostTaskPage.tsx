@@ -136,7 +136,7 @@ export function PostTaskPage() {
             {estimating ? "Thinking..." : "✨ Get AI Estimate"}
           </button>
           {estimate && (
-            <div className="rounded-xl bg-white dark:bg-slate-800 border border-purple/20 p-3 text-sm">{estimate}</div>
+            <div className="rounded-xl bg-white dark:bg-[#141414] border border-purple/20 p-3 text-sm">{estimate}</div>
           )}
         </div>
       </div>

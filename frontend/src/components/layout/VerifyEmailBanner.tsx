@@ -26,7 +26,7 @@ export function VerifyEmailBanner() {
       {sent ? (
         <span className="font-semibold text-green">Verification email sent — check your inbox.</span>
       ) : (
-        <button onClick={resend} disabled={sending} className="font-semibold text-coral hover:underline">
+        <button onClick={resend} disabled={sending} className="font-semibold text-ink dark:text-white hover:underline">
           {sending ? "Sending…" : "Resend email"}
         </button>
       )}

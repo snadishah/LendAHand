@@ -83,7 +83,7 @@ export function Navbar() {
           >
             🔔
             {unreadCount > 0 && (
-              <span className="absolute -top-0.5 -right-0.5 bg-coral text-white text-[10px] font-bold rounded-full h-4 min-w-4 px-1 flex items-center justify-center">
+              <span className="absolute -top-0.5 -right-0.5 bg-ink dark:bg-white text-white dark:text-ink text-[10px] font-bold rounded-full h-4 min-w-4 px-1 flex items-center justify-center">
                 {unreadCount}
               </span>
             )}
@@ -94,7 +94,7 @@ export function Navbar() {
               <div className="flex items-center justify-between mb-2">
                 <p className="font-bold text-sm">Notifications</p>
                 {unreadCount > 0 && (
-                  <button onClick={() => markAllRead()} className="text-xs text-coral font-semibold hover:underline">
+                  <button onClick={() => markAllRead()} className="text-xs text-ink dark:text-white font-semibold hover:underline">
                     Mark all read
                   </button>
                 )}

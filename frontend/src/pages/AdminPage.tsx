@@ -54,13 +54,13 @@ export function AdminPage() {
         <div className="rounded-xl bg-red-50 dark:bg-red-950 text-red-600 dark:text-red-400 text-sm px-4 py-3">{error}</div>
       )}
 
-      <div className="flex gap-1 bg-[#F7F6F2] dark:bg-slate-900 rounded-full p-1 w-fit">
+      <div className="flex gap-1 bg-[#F7F6F2] dark:bg-[#0B0B0B] rounded-full p-1 w-fit">
         {(["overview", "disputes", "users", "tasks"] as Tab[]).map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
             className={`rounded-full px-4 py-1.5 text-sm font-semibold capitalize transition-colors ${
-              tab === t ? "bg-white dark:bg-slate-700 shadow-card text-coral" : "text-muted"
+              tab === t ? "bg-white dark:bg-[#242424] shadow-card text-ink dark:text-white" : "text-muted"
             }`}
           >
             {t}
@@ -107,7 +107,7 @@ function Stat({ label, value, accent }: { label: string; value: ReactNode; accen
   return (
     <div className="card p-4">
       <p className="text-xs text-muted uppercase tracking-wide">{label}</p>
-      <p className={`text-2xl font-extrabold mt-1 ${accent ? "text-coral" : ""}`}>{value}</p>
+      <p className={`text-2xl font-extrabold mt-1 ${accent ? "text-ink dark:text-white" : ""}`}>{value}</p>
     </div>
   );
 }
@@ -159,7 +159,7 @@ function Disputes({ onError }: { onError: (m: string | null) => void }) {
             <Link to={`/tasks/${d.task.id}`} className="font-bold hover:underline">
               {d.task.title}
             </Link>
-            <span className="text-sm font-semibold text-coral">Rs. {d.task.acceptedAmount?.toFixed(0) ?? "—"}</span>
+            <span className="text-sm font-semibold text-ink dark:text-white">Rs. {d.task.acceptedAmount?.toFixed(0) ?? "—"}</span>
           </div>
           <p className="text-sm">
             <span className="text-muted">Raised by {d.raisedBy.name}:</span> “{d.reason}”

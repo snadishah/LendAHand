@@ -20,10 +20,10 @@ export function StarRating({ rating, count, size = "sm", interactive = false, on
           onClick={interactive ? () => onChange?.(star) : undefined}
           className={
             interactive
-              ? "cursor-pointer text-yellow hover:scale-110 transition-transform"
+              ? "cursor-pointer text-ink dark:text-white hover:scale-110 transition-transform"
               : star <= rounded
-              ? "text-yellow"
-              : "text-slate-300 dark:text-slate-600"
+              ? "text-ink dark:text-white"
+              : "text-ink/20 dark:text-white/25"
           }
         >
           {interactive ? (star <= rounded ? "★" : "☆") : "★"}

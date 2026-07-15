@@ -53,7 +53,7 @@ export function DashboardPage() {
       <div className="grid sm:grid-cols-2 gap-4">
         <div className="card p-4">
           <div className="flex items-center justify-between mb-3">
-            <div className="flex gap-1 bg-[#F7F6F2] dark:bg-slate-900 rounded-full p-1">
+            <div className="flex gap-1 bg-[#F7F6F2] dark:bg-[#0B0B0B] rounded-full p-1">
               <TabButton active={tab === "open"} onClick={() => setTab("open")}>
                 Open Tasks
               </TabButton>
@@ -61,7 +61,7 @@ export function DashboardPage() {
                 My Tasks
               </TabButton>
             </div>
-            <Link to="/tasks" className="text-xs font-semibold text-coral hover:underline">
+            <Link to="/tasks" className="text-xs font-semibold text-ink dark:text-white hover:underline">
               View all →
             </Link>
           </div>
@@ -95,7 +95,7 @@ function TabButton({ active, onClick, children }: { active: boolean; onClick: ()
     <button
       onClick={onClick}
       className={`rounded-full px-3.5 py-1.5 text-sm font-semibold transition-colors ${
-        active ? "bg-white dark:bg-slate-700 shadow-card text-coral" : "text-muted"
+        active ? "bg-white dark:bg-[#242424] shadow-card text-ink dark:text-white" : "text-muted"
       }`}
     >
       {children}

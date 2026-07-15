@@ -194,7 +194,7 @@ export function TaskDetailsPage() {
 
   return (
     <div className="space-y-5 max-w-4xl">
-      <button onClick={() => navigate(-1)} className="text-sm text-muted hover:text-navy dark:hover:text-slate-100">
+      <button onClick={() => navigate(-1)} className="text-sm text-muted hover:text-navy dark:hover:text-white">
         ← Back
       </button>
 
@@ -211,7 +211,7 @@ export function TaskDetailsPage() {
           <PageHeader title={task.title} actions={<StatusChip status={task.status} />} />
         </div>
 
-        <p className="text-navy dark:text-slate-200 whitespace-pre-wrap">{task.description}</p>
+        <p className="text-navy dark:text-[#D4D1C8] whitespace-pre-wrap">{task.description}</p>
 
         <div className="grid sm:grid-cols-3 gap-3 text-sm">
           <InfoBlock label="Budget" value={`Rs. ${task.budget.toFixed(0)}`} accent />
@@ -284,13 +284,13 @@ export function TaskDetailsPage() {
                     <p className="font-semibold">{contact.other.name}</p>
                     <div className="flex flex-wrap gap-x-4 gap-y-1 mt-0.5">
                       {contact.other.phone && (
-                        <a href={`tel:${contact.other.phone}`} className="text-coral font-semibold hover:underline">
+                        <a href={`tel:${contact.other.phone}`} className="text-ink dark:text-white font-semibold hover:underline">
                           📱 {contact.other.phone}
                         </a>
                       )}
                       <a
                         href={`mailto:${contact.other.email}`}
-                        className="text-coral font-semibold hover:underline truncate"
+                        className="text-ink dark:text-white font-semibold hover:underline truncate"
                       >
                         ✉️ {contact.other.email}
                       </a>
@@ -435,7 +435,7 @@ function InfoBlock({ label, value, accent }: { label: string; value: string; acc
   return (
     <div>
       <p className="text-xs text-muted uppercase tracking-wide">{label}</p>
-      <p className={`font-semibold truncate ${accent ? "text-coral text-lg" : ""}`}>{value}</p>
+      <p className={`font-semibold truncate ${accent ? "text-ink dark:text-white text-lg" : ""}`}>{value}</p>
     </div>
   );
 }

@@ -198,7 +198,7 @@ export function SettingsPage() {
           aria-label="Toggle dark mode"
           onClick={toggle}
           className={`relative h-7 w-12 shrink-0 rounded-full transition-colors ${
-            dark ? "bg-coral" : "bg-slate-300 dark:bg-slate-600"
+            dark ? "bg-ink dark:bg-white" : "bg-slate-300 dark:bg-[#2E2E2E]"
           }`}
         >
           <span
@@ -224,7 +224,7 @@ export function SettingsPage() {
           disabled={savingEmailPref}
           onClick={toggleEmailPref}
           className={`relative h-7 w-12 shrink-0 rounded-full transition-colors ${
-            emailsOn ? "bg-coral" : "bg-slate-300 dark:bg-slate-600"
+            emailsOn ? "bg-ink dark:bg-white" : "bg-slate-300 dark:bg-[#2E2E2E]"
           }`}
         >
           <span

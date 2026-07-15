@@ -63,11 +63,11 @@ export function WalletPage() {
       </div>
 
       <form onSubmit={handleSubmit} className="card p-5 space-y-4">
-        <div className="flex gap-1 bg-[#F7F6F2] dark:bg-slate-900 rounded-full p-1 w-fit">
-          <button type="button" onClick={() => setTab("deposit")} className={`rounded-full px-4 py-1.5 text-sm font-semibold ${tab === "deposit" ? "bg-white dark:bg-slate-700 shadow-card text-green" : "text-muted"}`}>
+        <div className="flex gap-1 bg-[#F7F6F2] dark:bg-[#0B0B0B] rounded-full p-1 w-fit">
+          <button type="button" onClick={() => setTab("deposit")} className={`rounded-full px-4 py-1.5 text-sm font-semibold ${tab === "deposit" ? "bg-white dark:bg-[#242424] shadow-card text-green" : "text-muted"}`}>
             Deposit
           </button>
-          <button type="button" onClick={() => setTab("withdraw")} className={`rounded-full px-4 py-1.5 text-sm font-semibold ${tab === "withdraw" ? "bg-white dark:bg-slate-700 shadow-card text-coral" : "text-muted"}`}>
+          <button type="button" onClick={() => setTab("withdraw")} className={`rounded-full px-4 py-1.5 text-sm font-semibold ${tab === "withdraw" ? "bg-white dark:bg-[#242424] shadow-card text-ink dark:text-white" : "text-muted"}`}>
             Withdraw
           </button>
         </div>
@@ -89,7 +89,7 @@ export function WalletPage() {
         ) : transactions.length === 0 ? (
           <EmptyState emoji="💳" title="No transactions yet" />
         ) : (
-          <ul className="divide-y divide-[#E8E8E8] dark:divide-slate-700">
+          <ul className="divide-y divide-[#E8E8E8] dark:divide-white/10">
             {transactions.map((tx) => {
               const meta = TX_LABEL[tx.type];
               return (
@@ -101,7 +101,7 @@ export function WalletPage() {
                       <p className="text-xs text-muted truncate">{tx.note}</p>
                     </div>
                   </div>
-                  <span className={`font-bold shrink-0 ${meta.sign === "+" ? "text-green" : "text-coral"}`}>
+                  <span className={`font-bold shrink-0 ${meta.sign === "+" ? "text-green" : "text-ink dark:text-white"}`}>
                     {meta.sign} Rs. {tx.amount.toFixed(0)}
                   </span>
                 </li>

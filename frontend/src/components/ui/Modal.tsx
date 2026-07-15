@@ -14,7 +14,7 @@ export function Modal({ title, onClose, children }: ModalProps) {
           <h2 className="text-lg font-bold">{title}</h2>
           <button
             onClick={onClose}
-            className="text-muted hover:text-navy dark:hover:text-slate-100 text-xl leading-none"
+            className="text-muted hover:text-navy dark:hover:text-white text-xl leading-none"
             aria-label="Close"
           >
             ✕

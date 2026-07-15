@@ -53,7 +53,7 @@ function HelperBidsView() {
                     bid.status === "ACCEPTED"
                       ? "bg-green/15 text-green"
                       : bid.status === "REJECTED"
-                      ? "bg-slate-200 text-slate-500 dark:bg-slate-700 dark:text-slate-300"
+                      ? "bg-slate-200 text-slate-500 dark:bg-[#242424] dark:text-[#B8B5AC]"
                       : "bg-yellow/25 text-[#946200] dark:text-yellow"
                   }`}
                 >

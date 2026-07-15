@@ -16,7 +16,7 @@ export function QuickPrompts({ onSelect, disabled }: { onSelect: (text: string) 
           key={p.text}
           disabled={disabled}
           onClick={() => onSelect(p.text)}
-          className="w-full text-left text-sm rounded-xl px-3 py-2.5 bg-[#F7F6F2] dark:bg-slate-900 hover:bg-purple/10 hover:text-purple transition-colors disabled:opacity-50"
+          className="w-full text-left text-sm rounded-xl px-3 py-2.5 bg-[#F7F6F2] dark:bg-[#0B0B0B] hover:bg-purple/10 hover:text-purple transition-colors disabled:opacity-50"
         >
           {p.icon} {p.text}
         </button>

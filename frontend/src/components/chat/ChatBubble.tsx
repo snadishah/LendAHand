@@ -14,7 +14,7 @@ export function ChatBubble({ turn }: { turn: ChatTurn }) {
   return (
     <div className="flex justify-start gap-2">
       <span className="text-xl shrink-0">🤖</span>
-      <div className="max-w-[80%] rounded-2xl rounded-bl-sm bg-white dark:bg-slate-800 border border-[#E8E8E8] dark:border-slate-700 px-4 py-2.5 text-sm shadow-card whitespace-pre-wrap">
+      <div className="max-w-[80%] rounded-2xl rounded-bl-sm bg-white dark:bg-[#141414] border border-[#E8E8E8] dark:border-white/10 px-4 py-2.5 text-sm shadow-card whitespace-pre-wrap">
         {turn.text}
       </div>
     </div>
