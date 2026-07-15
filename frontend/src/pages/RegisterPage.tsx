@@ -38,21 +38,21 @@ export function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-paper text-ink dark:bg-[#0B0B0B] dark:text-[#EDEBE4] md:grid md:grid-cols-[1fr_1.05fr]">
+    <div className="min-h-screen md:h-screen md:overflow-hidden bg-paper text-ink dark:bg-[#0B0B0B] dark:text-[#EDEBE4] md:grid md:grid-cols-[1fr_1.05fr]">
       {/* Left — form */}
-      <main className="order-2 md:order-1 flex items-center justify-center px-6 py-14">
+      <main className="order-2 md:order-1 flex items-center justify-center px-6 py-10 md:h-screen md:overflow-y-auto">
         <form onSubmit={handleSubmit} className="w-full max-w-md">
           <Link to="/" className="md:hidden mb-8 flex items-center gap-2 font-display font-bold text-lg">
             <span className="text-2xl">🤝</span> LendAHand
           </Link>
 
           <p className="eyebrow">Create account</p>
-          <h2 className="mt-3 font-display font-bold text-[clamp(2rem,5vw,3rem)] leading-none tracking-tightest">
+          <h2 className="mt-2 font-display font-bold text-[clamp(1.75rem,5vw,2.75rem)] leading-none tracking-tightest">
             Join in.
           </h2>
-          <p className="text-muted mt-3">How do you want to use LendAHand?</p>
+          <p className="text-muted mt-2">How do you want to use LendAHand?</p>
 
-          <div className="mt-5 grid grid-cols-2 gap-3">
+          <div className="mt-4 grid grid-cols-2 gap-3">
             <RolePick icon="🧑‍💼" label="Post Tasks" bonus="Rs. 200 to start" selected={userType === "POSTER"} onClick={() => setUserType("POSTER")} />
             <RolePick icon="🦺" label="Help & Earn" bonus="Rs. 50 to start" selected={userType === "HELPER"} onClick={() => setUserType("HELPER")} />
           </div>
@@ -63,7 +63,7 @@ export function RegisterPage() {
             </div>
           )}
 
-          <div className="mt-5 space-y-4">
+          <div className="mt-4 space-y-3">
             <Field label="Full name">
               <input required className="input-field" value={name} onChange={(e) => setName(e.target.value)} placeholder="Ayesha Khan" />
             </Field>
@@ -83,11 +83,11 @@ export function RegisterPage() {
             </div>
           </div>
 
-          <button type="submit" disabled={submitting} className="btn-primary w-full mt-7 !py-3 text-base">
+          <button type="submit" disabled={submitting} className="btn-primary w-full mt-5 !py-3 text-base">
             {submitting ? "Creating account…" : "Create Account →"}
           </button>
 
-          <div className="mt-8 pt-6 border-t border-ink/10 dark:border-white/10 text-center text-sm text-muted">
+          <div className="mt-5 pt-5 border-t border-ink/10 dark:border-white/10 text-center text-sm text-muted">
             Already have an account?{" "}
             <Link to="/login" className="font-semibold text-ink dark:text-white hover:underline underline-offset-4">
               Log in

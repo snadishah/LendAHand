@@ -5,7 +5,7 @@ import { useAuth } from "../context/AuthContext";
 
 function CenteredCard({ children }: { children: ReactNode }) {
   return (
-    <div className="min-h-screen flex items-center justify-center px-6 py-16 bg-[#F7F6F2] dark:bg-[#0B0B0B]">
+    <div className="min-h-screen flex items-center justify-center px-6 py-16 bg-ink/5 dark:bg-white/5">
       <div className="w-full max-w-md card p-8 space-y-4">
         <Link to="/" className="flex items-center gap-2 font-extrabold text-lg">
           <span className="text-2xl">🤝</span> LendAHand

@@ -59,7 +59,7 @@ export function ChatPage() {
             <div ref={bottomRef} />
           </div>
 
-          <form onSubmit={handleSubmit} className="border-t border-[#E8E8E8] dark:border-white/10 p-3 flex gap-2">
+          <form onSubmit={handleSubmit} className="border-t border-ink/10 dark:border-white/10 p-3 flex gap-2">
             <input
               className="input-field"
               placeholder="Ask me anything about LendAHand..."

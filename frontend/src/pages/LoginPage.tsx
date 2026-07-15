@@ -30,9 +30,9 @@ export function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-paper text-ink dark:bg-[#0B0B0B] dark:text-[#EDEBE4] md:grid md:grid-cols-[1.05fr_1fr]">
+    <div className="min-h-screen md:h-screen md:overflow-hidden bg-paper text-ink dark:bg-[#0B0B0B] dark:text-[#EDEBE4] md:grid md:grid-cols-[1.05fr_1fr]">
       {/* Left — bold ink panel */}
-      <aside className="relative overflow-hidden bg-ink text-paper dark:bg-white dark:text-ink flex flex-col justify-between p-8 sm:p-12 min-h-[38vh] md:min-h-screen">
+      <aside className="relative overflow-hidden bg-ink text-paper dark:bg-white dark:text-ink flex flex-col justify-between p-8 sm:p-12 min-h-[38vh] md:min-h-0 md:h-screen">
         <div className="absolute -right-16 -top-24 text-[26rem] leading-none opacity-[0.06] select-none pointer-events-none font-display">★</div>
         <div className="absolute right-10 bottom-40 h-40 w-40 rounded-full border border-paper/20 dark:border-ink/20" />
 
@@ -64,7 +64,7 @@ export function LoginPage() {
       </aside>
 
       {/* Right — form */}
-      <main className="flex items-center justify-center px-6 py-14">
+      <main className="flex items-center justify-center px-6 py-14 md:h-screen md:overflow-y-auto">
         <form onSubmit={handleSubmit} className="w-full max-w-sm">
           <Link to="/" className="md:hidden mb-8 flex items-center gap-2 font-display font-bold text-lg">
             <span className="text-2xl">🤝</span> LendAHand

@@ -54,7 +54,7 @@ export function AdminPage() {
         <div className="rounded-xl bg-red-50 dark:bg-red-950 text-red-600 dark:text-red-400 text-sm px-4 py-3">{error}</div>
       )}
 
-      <div className="flex gap-1 bg-[#F7F6F2] dark:bg-[#0B0B0B] rounded-full p-1 w-fit">
+      <div className="flex gap-1 bg-ink/5 dark:bg-white/5 rounded-full p-1 w-fit">
         {(["overview", "disputes", "users", "tasks"] as Tab[]).map((t) => (
           <button
             key={t}
