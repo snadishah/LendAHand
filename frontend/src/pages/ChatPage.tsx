@@ -3,7 +3,7 @@ import { apiPost, ApiError } from "../lib/api";
 import type { ChatTurn } from "../types";
 import { ChatBubble } from "../components/chat/ChatBubble";
 import { QuickPrompts } from "../components/chat/QuickPrompts";
-import { PageHeader } from "../components/ui/PageHeader";
+import { PageHero } from "../components/ui/PageHero";
 
 const WELCOME: ChatTurn = {
   role: "model",
@@ -46,10 +46,10 @@ export function ChatPage() {
   }
 
   return (
-    <div className="space-y-5">
-      <PageHeader icon="🤖" title="AI Chat Assistant" subtitle="Ask about posting tasks, bidding, wallet, escrow, or pricing." />
+    <div className="space-y-6">
+      <PageHero eyebrow="AI Assistant" title="Ask me anything." subtitle="Posting tasks, bidding, wallet, escrow, or pricing — I've got you." glyph="🤖" />
 
-      <div className="grid lg:grid-cols-3 gap-5 h-[calc(100vh-240px)] min-h-[420px]">
+      <div className="grid lg:grid-cols-3 gap-5 h-[calc(100vh-340px)] min-h-[420px]">
         <div className="lg:col-span-2 card flex flex-col overflow-hidden">
           <div className="flex-1 overflow-y-auto px-5 py-4 space-y-3">
             {turns.map((t, i) => (

@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { apiGet, apiPatch, apiPost, ApiError } from "../lib/api";
 import type { DisputeResolution } from "../types";
-import { PageHeader } from "../components/ui/PageHeader";
+import { PageHero } from "../components/ui/PageHero";
 import { Spinner, EmptyState } from "../components/ui/EmptyState";
 import { StatusChip } from "../components/ui/StatusChip";
 
@@ -48,7 +48,7 @@ export function AdminPage() {
 
   return (
     <div className="space-y-5">
-      <PageHeader icon="🛡️" title="Admin Console" subtitle="Moderate the marketplace, settle disputes, and keep users safe." />
+      <PageHero eyebrow="Admin" title="Control room." subtitle="Moderate the marketplace, settle disputes, and keep users safe." glyph="🛡️" />
 
       {error && (
         <div className="rounded-xl bg-red-50 dark:bg-red-950 text-red-600 dark:text-red-400 text-sm px-4 py-3">{error}</div>

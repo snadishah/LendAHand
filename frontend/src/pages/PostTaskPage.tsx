@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { apiGet, apiPost, ApiError } from "../lib/api";
 import { useAuth } from "../context/AuthContext";
 import type { Category, Task } from "../types";
-import { PageHeader } from "../components/ui/PageHeader";
+import { PageHero } from "../components/ui/PageHero";
 
 export function PostTaskPage() {
   const { user, refreshUser } = useAuth();
@@ -73,13 +73,18 @@ export function PostTaskPage() {
   }
 
   return (
-    <div className="space-y-5">
-      <PageHeader icon="➕" title="Post a New Task" subtitle="Describe what you need done — a Helper will bid on it soon." />
+    <div className="space-y-6">
+      <PageHero
+        eyebrow="Post a task"
+        title="What do you need done?"
+        subtitle="Describe it, set a budget, and helpers will start bidding."
+        glyph="➕"
+      />
 
-      <div className="grid lg:grid-cols-3 gap-5">
-        <form onSubmit={handleSubmit} className="lg:col-span-2 card p-5 space-y-4">
+      <div className="grid lg:grid-cols-3 gap-5 items-start">
+        <form onSubmit={handleSubmit} className="lg:col-span-2 card p-6 space-y-4">
           {error && (
-            <div className="rounded-xl bg-red-50 dark:bg-red-950 text-red-600 dark:text-red-400 text-sm px-4 py-3">
+            <div className="rounded-xl border border-red-300 dark:border-red-900/60 bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400 text-sm px-4 py-3">
               {error}
             </div>
           )}
@@ -129,14 +134,22 @@ export function PostTaskPage() {
           </button>
         </form>
 
-        <div className="card p-5 space-y-3 bg-purple/5 border-purple/20">
-          <p className="font-bold flex items-center gap-2">✨ AI Price Estimator</p>
-          <p className="text-sm text-muted">Get a Gemini-powered suggestion for a fair price and time estimate.</p>
-          <button type="button" onClick={handleEstimate} disabled={estimating} className="btn-secondary w-full !border-purple !text-purple">
-            {estimating ? "Thinking..." : "✨ Get AI Estimate"}
+        <div className="rounded-card bg-ink text-paper dark:bg-white dark:text-ink p-6 space-y-3">
+          <p className="eyebrow !text-paper/50 dark:!text-ink/50">✨ AI Estimator</p>
+          <p className="font-display font-semibold text-lg leading-snug">Not sure what to pay?</p>
+          <p className="text-sm text-paper/60 dark:text-ink/60">Get a Gemini-powered suggestion for a fair price and time estimate from your description.</p>
+          <button
+            type="button"
+            onClick={handleEstimate}
+            disabled={estimating}
+            className="w-full rounded-full py-2.5 font-semibold bg-paper text-ink dark:bg-ink dark:text-paper hover:opacity-90 transition-opacity disabled:opacity-50"
+          >
+            {estimating ? "Thinking…" : "Get AI Estimate"}
           </button>
           {estimate && (
-            <div className="rounded-xl bg-white dark:bg-[#141414] border border-purple/20 p-3 text-sm">{estimate}</div>
+            <div className="rounded-xl bg-paper/10 dark:bg-ink/10 border border-paper/20 dark:border-ink/20 p-3 text-sm leading-relaxed">
+              {estimate}
+            </div>
           )}
         </div>
       </div>

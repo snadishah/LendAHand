@@ -7,7 +7,7 @@ import { StatusChip } from "../components/ui/StatusChip";
 import { BidCard } from "../components/tasks/BidCard";
 import { EmptyState, Spinner } from "../components/ui/EmptyState";
 import { Avatar } from "../components/ui/Avatar";
-import { PageHeader } from "../components/ui/PageHeader";
+import { PageHero } from "../components/ui/PageHero";
 
 export function MyBidsPage() {
   const { user, refreshUser } = useAuth();
@@ -28,7 +28,7 @@ function HelperBidsView() {
 
   return (
     <div className="space-y-5">
-      <PageHeader icon="📝" title="My Bids" subtitle="Track the bids you've placed and their status." />
+      <PageHero eyebrow="My bids" title="Track your offers." subtitle="Every bid you've placed and where it stands." glyph="📝" />
       {loading ? (
         <Spinner />
       ) : bids.length === 0 ? (
@@ -109,7 +109,7 @@ function PosterBidsView({ refreshUser }: { refreshUser: () => Promise<void> }) {
 
   return (
     <div className="space-y-5">
-      <PageHeader icon="📝" title="Manage Bids" subtitle="Review and accept bids on the tasks you've posted." />
+      <PageHero eyebrow="Manage bids" title="Review the offers." subtitle="Accept the best bid on each task you've posted." glyph="📝" />
       {loading ? (
         <Spinner />
       ) : tasksWithBids.length === 0 ? (

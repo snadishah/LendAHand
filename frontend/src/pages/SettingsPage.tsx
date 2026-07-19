@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { apiPatch, ApiError } from "../lib/api";
 import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
-import { PageHeader } from "../components/ui/PageHeader";
+import { PageHero } from "../components/ui/PageHero";
 import { Avatar } from "../components/ui/Avatar";
 
 export function SettingsPage() {
@@ -84,7 +84,7 @@ export function SettingsPage() {
 
   return (
     <div className="space-y-5 max-w-3xl">
-      <PageHeader icon="⚙️" title="Settings" subtitle="Manage your profile, password, and preferences." />
+      <PageHero eyebrow="Settings" title="Your account." subtitle="Manage your profile, password, and preferences." glyph="⚙️" />
 
       <form onSubmit={handleSaveProfile} className="card p-5 space-y-4">
         <div className="flex items-center gap-3">

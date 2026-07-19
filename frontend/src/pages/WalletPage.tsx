@@ -65,9 +65,9 @@ export function WalletPage() {
         </p>
       </section>
 
-      <div className="grid md:grid-cols-[1fr_1.4fr] gap-6">
+      <div className="grid md:grid-cols-2 gap-6 items-stretch">
         {/* Deposit / Withdraw */}
-        <form onSubmit={handleSubmit} className="card p-6 space-y-4 h-fit">
+        <form onSubmit={handleSubmit} className="card p-6 flex flex-col gap-4">
           <div className="inline-flex w-full rounded-full border border-ink/12 dark:border-white/15 p-1">
             {(["deposit", "withdraw"] as const).map((t) => (
               <button
@@ -93,13 +93,27 @@ export function WalletPage() {
             <label className="text-sm font-semibold mb-1.5 block">Amount (Rs.)</label>
             <input type="number" min="1" required className="input-field text-lg" placeholder="0" value={amount} onChange={(e) => setAmount(e.target.value)} />
           </div>
-          <button type="submit" disabled={submitting} className="btn-primary w-full !py-3">
+
+          <div className="grid grid-cols-4 gap-2">
+            {[100, 500, 1000, 5000].map((q) => (
+              <button
+                key={q}
+                type="button"
+                onClick={() => setAmount(String(q))}
+                className="rounded-full border border-ink/15 dark:border-white/20 py-2 text-sm font-semibold hover:bg-ink hover:text-paper dark:hover:bg-white dark:hover:text-ink transition-colors"
+              >
+                {q}
+              </button>
+            ))}
+          </div>
+
+          <button type="submit" disabled={submitting} className="btn-primary w-full !py-3 mt-auto">
             {submitting ? "Processing…" : tab === "deposit" ? "Add Funds" : "Withdraw"}
           </button>
         </form>
 
         {/* History */}
-        <div className="card p-6">
+        <div className="card p-6 flex flex-col">
           <p className="font-display font-semibold text-lg mb-4">Transaction history</p>
           {loading ? (
             <Spinner />

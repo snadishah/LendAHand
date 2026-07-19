@@ -62,11 +62,13 @@ export function MapPage() {
 
       {locateError && <div className="rounded-xl bg-red-50 dark:bg-red-950 text-red-600 dark:text-red-400 text-sm px-4 py-3">{locateError}</div>}
 
-      <div className="flex gap-3 text-xs">
-        <Legend color="#22C55E" label="Open" />
-        <Legend color="#FFD166" label="In Progress" />
-        <Legend color="#94A3B8" label="Done" />
-        <Legend color="#EF4444" label="Cancelled" />
+      <div className="flex flex-wrap gap-x-4 gap-y-1.5 text-xs">
+        <Legend color="#0A0A0A" label="Open" />
+        <Legend color="#595959" label="In Progress" />
+        <Legend color="#2E2E2E" label="Submitted" />
+        <Legend color="#AEAAA1" label="Done" />
+        <Legend color="#D0CDC4" label="Cancelled" />
+        <Legend color="#7A756B" label="Disputed" />
       </div>
 
       <div className="card p-2 flex-1 min-h-0 overflow-hidden">
@@ -83,7 +85,7 @@ export function MapPage() {
 function Legend({ color, label }: { color: string; label: string }) {
   return (
     <span className="flex items-center gap-1.5">
-      <span className="h-2.5 w-2.5 rounded-full" style={{ background: color }} />
+      <span className="h-2.5 w-2.5 rounded-full border border-ink/20 dark:border-white/30" style={{ background: color }} />
       {label}
     </span>
   );
