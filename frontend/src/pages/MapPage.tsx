@@ -63,12 +63,12 @@ export function MapPage() {
       {locateError && <div className="rounded-xl bg-red-50 dark:bg-red-950 text-red-600 dark:text-red-400 text-sm px-4 py-3">{locateError}</div>}
 
       <div className="flex flex-wrap gap-x-4 gap-y-1.5 text-xs">
-        <Legend color="#0A0A0A" label="Open" />
-        <Legend color="#595959" label="In Progress" />
-        <Legend color="#2E2E2E" label="Submitted" />
-        <Legend color="#AEAAA1" label="Done" />
-        <Legend color="#D0CDC4" label="Cancelled" />
-        <Legend color="#7A756B" label="Disputed" />
+        <Legend color="#16A34A" label="Open" />
+        <Legend color="#F59E0B" label="In Progress" />
+        <Legend color="#2563EB" label="Submitted" />
+        <Legend color="#6B7280" label="Done" />
+        <Legend color="#DC2626" label="Cancelled" />
+        <Legend color="#EA580C" label="Disputed" />
       </div>
 
       <div className="card p-2 flex-1 min-h-0 overflow-hidden">

@@ -17,7 +17,7 @@ function CenteredCard({ children }: { children: ReactNode }) {
 }
 
 const errBox = "rounded-xl bg-red-50 dark:bg-red-950 text-red-600 dark:text-red-400 text-sm px-4 py-3";
-const okBox = "rounded-xl bg-green/10 text-green text-sm px-4 py-3";
+const okBox = "rounded-xl bg-ink/5 dark:bg-white/5 text-ink dark:text-white text-sm px-4 py-3";
 
 export function VerifyEmailPage() {
   const [params] = useSearchParams();

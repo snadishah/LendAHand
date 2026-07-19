@@ -3,14 +3,24 @@ import { useNavigate, useParams } from "react-router-dom";
 import { apiGet, apiPatch, apiPost, ApiError } from "../lib/api";
 import { useAuth } from "../context/AuthContext";
 import type { Bid, ContactStatus, Task, TaskUserRef } from "../types";
-import { StatusChip } from "../components/ui/StatusChip";
 import { Spinner } from "../components/ui/EmptyState";
 import { Avatar } from "../components/ui/Avatar";
-import { PageHeader } from "../components/ui/PageHeader";
 import { BidCard } from "../components/tasks/BidCard";
 import { ReviewModal } from "../components/tasks/ReviewModal";
 import { Modal } from "../components/ui/Modal";
 import { MapView } from "../components/map/MapView";
+
+const STATUS_TEXT: Record<string, string> = {
+  OPEN: "Open",
+  IN_PROGRESS: "In Progress",
+  SUBMITTED: "Awaiting Confirmation",
+  DONE: "Done",
+  CANCELLED: "Cancelled",
+  DISPUTED: "Disputed",
+};
+
+const errBox =
+  "rounded-xl border border-red-300 dark:border-red-900/60 bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400 text-sm px-4 py-3";
 
 interface OpenDispute {
   id: number;
@@ -158,10 +168,8 @@ export function TaskDetailsPage() {
     }
   }
 
-  const handleSubmitWork = () =>
-    runAction(() => apiPatch(`/tasks/${id}/submit`, {}), "Couldn't submit your work.");
-  const handleConfirm = () =>
-    runAction(() => apiPatch(`/tasks/${id}/done`, {}), "Couldn't confirm this task.", true);
+  const handleSubmitWork = () => runAction(() => apiPatch(`/tasks/${id}/submit`, {}), "Couldn't submit your work.");
+  const handleConfirm = () => runAction(() => apiPatch(`/tasks/${id}/done`, {}), "Couldn't confirm this task.", true);
 
   function handleCancel() {
     if (!confirm("Cancel this task? Any escrowed funds will be refunded to your wallet.")) return;
@@ -194,39 +202,66 @@ export function TaskDetailsPage() {
 
   return (
     <div className="space-y-5 max-w-4xl">
-      <button onClick={() => navigate(-1)} className="text-sm text-muted hover:text-navy dark:hover:text-white">
+      <button onClick={() => navigate(-1)} className="text-sm font-semibold text-muted hover:text-ink dark:hover:text-white transition-colors">
         ← Back
       </button>
 
-      {error && (
-        <div className="rounded-xl bg-red-50 dark:bg-red-950 text-red-600 dark:text-red-400 text-sm px-4 py-3">{error}</div>
+      {error && <div className={errBox}>{error}</div>}
+
+      {/* Hero */}
+      <section className="relative overflow-hidden rounded-card bg-ink text-paper dark:bg-white dark:text-ink p-7 sm:p-9">
+        <div className="absolute -right-6 -top-14 text-[13rem] leading-none opacity-[0.06] font-display select-none pointer-events-none">
+          {task.category.icon}
+        </div>
+        <div className="relative">
+          <p className="eyebrow !text-paper/50 dark:!text-ink/50">{task.category.icon} {task.category.name}</p>
+          <h1 className="mt-3 font-display font-bold tracking-tightest leading-[0.95] text-[clamp(1.9rem,5vw,3.25rem)]">
+            {task.title}
+          </h1>
+          <div className="mt-6 flex flex-wrap items-center gap-4">
+            <span className="rounded-full border border-paper/30 dark:border-ink/30 px-3 py-1 text-xs font-semibold uppercase tracking-wide">
+              {STATUS_TEXT[task.status]}
+            </span>
+            <span className="font-display font-bold text-2xl sm:text-3xl tracking-tightest">Rs. {task.budget.toFixed(0)}</span>
+          </div>
+        </div>
+      </section>
+
+      {/* Dispute banner */}
+      {task.status === "DISPUTED" && (
+        <div className="card p-5 space-y-1">
+          <p className="font-display font-semibold">⚖️ This task is under dispute</p>
+          <p className="text-sm text-muted">
+            Our team will review it and release or refund the escrowed payment. The task is frozen until then.
+          </p>
+          {openDispute && (
+            <p className="text-sm mt-1">
+              <span className="text-muted">Raised by {openDispute.raisedBy.name}:</span> “{openDispute.reason}”
+            </p>
+          )}
+        </div>
       )}
 
-      <div className="card p-5 space-y-4">
-        <div>
-          <div className="flex items-center gap-2 text-sm text-muted mb-1">
-            <span>{task.category.icon}</span>
-            <span>{task.category.name}</span>
-          </div>
-          <PageHeader title={task.title} actions={<StatusChip status={task.status} />} />
-        </div>
+      {/* Details */}
+      <div className="card p-6 space-y-5">
+        <p className="whitespace-pre-wrap leading-relaxed">{task.description}</p>
 
-        <p className="text-navy dark:text-[#D4D1C8] whitespace-pre-wrap">{task.description}</p>
-
-        <div className="grid sm:grid-cols-3 gap-3 text-sm">
-          <InfoBlock label="Budget" value={`Rs. ${task.budget.toFixed(0)}`} accent />
+        <div className="grid sm:grid-cols-2 gap-4 text-sm pt-1">
           <div>
-            <p className="text-xs text-muted uppercase tracking-wide">Posted by</p>
-            <p className="font-semibold truncate flex items-center gap-1.5">
+            <p className="text-[11px] text-muted uppercase tracking-wide">Posted by</p>
+            <p className="font-semibold flex items-center gap-1.5 mt-1">
               <Avatar name={task.poster.name} size={20} />
               {task.poster.name}
             </p>
           </div>
-          <InfoBlock label="Address" value={task.address} />
+          <div>
+            <p className="text-[11px] text-muted uppercase tracking-wide">Address</p>
+            <p className="font-semibold mt-1">{task.address}</p>
+          </div>
         </div>
 
         {task.helper && (
-          <div className="rounded-xl bg-teal/10 text-sm px-4 py-2.5 flex items-center gap-2">
+          <div className="rounded-xl bg-ink/5 dark:bg-white/5 border border-ink/10 dark:border-white/10 text-sm px-4 py-3 flex items-center gap-2">
             <Avatar name={task.helper.name} size={24} />
             <span>
               Assigned to <span className="font-semibold">{task.helper.name}</span> for{" "}
@@ -242,73 +277,53 @@ export function TaskDetailsPage() {
         )}
       </div>
 
-      {task.status === "DISPUTED" && (
-        <div className="card p-5 space-y-1 border-orange/30 bg-orange/5">
-          <p className="font-bold">⚖️ This task is under dispute</p>
-          <p className="text-sm text-muted">
-            Our team will review it and release or refund the escrowed payment. The task is frozen until then.
-          </p>
-          {openDispute && (
-            <p className="text-sm mt-1">
-              <span className="text-muted">Raised by {openDispute.raisedBy.name}:</span> “{openDispute.reason}”
-            </p>
-          )}
-        </div>
-      )}
-
+      {/* Contact */}
       {contactEligible && (
-        <div className="card p-5 space-y-3">
-          <p className="font-bold">📞 Contact & Coordinate</p>
-
+        <div className="card p-6 space-y-3">
+          <p className="font-display font-semibold">📞 Contact & coordinate</p>
           {!contact ? (
-            <p className="text-sm text-muted">Loading contact status...</p>
+            <p className="text-sm text-muted">Loading contact status…</p>
           ) : (
             <>
               {contact.myShared ? (
-                <p className="text-sm text-green font-medium">✅ You've shared your contact info.</p>
+                <p className="text-sm font-medium">✅ You've shared your contact info.</p>
               ) : (
                 <div className="space-y-2">
-                  <p className="text-sm text-muted">
-                    Sharing lets the other person call or email you to coordinate this task.
-                  </p>
+                  <p className="text-sm text-muted">Sharing lets the other person call or email you to coordinate this task.</p>
                   <button onClick={handleShareContact} disabled={sharingContact} className="btn-primary">
-                    {sharingContact ? "Sharing..." : "Share My Contact Info"}
+                    {sharingContact ? "Sharing…" : "Share My Contact Info"}
                   </button>
                 </div>
               )}
 
               {contact.otherShared && contact.other ? (
-                <div className="rounded-xl bg-teal/10 p-4 flex items-center gap-3">
+                <div className="rounded-xl bg-ink/5 dark:bg-white/5 border border-ink/10 dark:border-white/10 p-4 flex items-center gap-3">
                   <Avatar name={contact.other.name} size={40} />
                   <div className="min-w-0 text-sm">
                     <p className="font-semibold">{contact.other.name}</p>
                     <div className="flex flex-wrap gap-x-4 gap-y-1 mt-0.5">
                       {contact.other.phone && (
-                        <a href={`tel:${contact.other.phone}`} className="text-ink dark:text-white font-semibold hover:underline">
+                        <a href={`tel:${contact.other.phone}`} className="font-semibold hover:underline">
                           📱 {contact.other.phone}
                         </a>
                       )}
-                      <a
-                        href={`mailto:${contact.other.email}`}
-                        className="text-ink dark:text-white font-semibold hover:underline truncate"
-                      >
+                      <a href={`mailto:${contact.other.email}`} className="font-semibold hover:underline truncate">
                         ✉️ {contact.other.email}
                       </a>
                     </div>
                   </div>
                 </div>
               ) : (
-                <p className="text-sm text-muted">
-                  Waiting for the {isOwner ? "helper" : "poster"} to share their contact info.
-                </p>
+                <p className="text-sm text-muted">Waiting for the {isOwner ? "helper" : "poster"} to share their contact info.</p>
               )}
             </>
           )}
         </div>
       )}
 
+      {/* Actions */}
       {hasPartyActions && (
-        <div className="card p-5 space-y-3">
+        <div className="card p-6 space-y-3">
           {canSubmit && (
             <p className="text-sm text-muted">Finished the work? Mark it as done and the poster will confirm to release your payment.</p>
           )}
@@ -317,38 +332,29 @@ export function TaskDetailsPage() {
           )}
           <div className="flex flex-wrap gap-2">
             {canSubmit && (
-              <button onClick={handleSubmitWork} disabled={actionLoading} className="btn-primary">
-                ✅ Mark Work as Done
-              </button>
+              <button onClick={handleSubmitWork} disabled={actionLoading} className="btn-primary">✅ Mark Work as Done</button>
             )}
             {canConfirm && (
-              <button onClick={handleConfirm} disabled={actionLoading} className="btn-primary">
-                🏁 Confirm & Release Payment
-              </button>
+              <button onClick={handleConfirm} disabled={actionLoading} className="btn-primary">🏁 Confirm & Release Payment</button>
             )}
             {canReview && (
-              <button onClick={() => setShowReview(true)} disabled={actionLoading} className="btn-primary">
-                ⭐ Leave a Review
-              </button>
+              <button onClick={() => setShowReview(true)} disabled={actionLoading} className="btn-primary">⭐ Leave a Review</button>
             )}
             {canDispute && (
-              <button onClick={() => setShowDispute(true)} disabled={actionLoading} className="btn-secondary">
-                ⚖️ Open a Dispute
-              </button>
+              <button onClick={() => setShowDispute(true)} disabled={actionLoading} className="btn-secondary">⚖️ Open a Dispute</button>
             )}
             {canCancel && (
-              <button onClick={handleCancel} disabled={actionLoading} className="btn-ghost-danger">
-                Cancel Task
-              </button>
+              <button onClick={handleCancel} disabled={actionLoading} className="btn-ghost-danger">Cancel Task</button>
             )}
-            {hasReviewed && <span className="text-sm text-green font-medium self-center">✓ You've reviewed this task</span>}
+            {hasReviewed && <span className="text-sm font-medium self-center">✓ You've reviewed this task</span>}
           </div>
         </div>
       )}
 
+      {/* Owner bids */}
       {isOwner && (
-        <div className="card p-5 space-y-4">
-          <p className="font-bold">Received Bids {bids.length > 0 && `(${bids.length})`}</p>
+        <div className="card p-6 space-y-4">
+          <p className="font-display font-semibold">Received bids {bids.length > 0 && `(${bids.length})`}</p>
           {bids.length === 0 ? (
             <p className="text-sm text-muted">No bids yet — check back soon.</p>
           ) : (
@@ -367,9 +373,10 @@ export function TaskDetailsPage() {
         </div>
       )}
 
+      {/* Place bid */}
       {isEligibleToBid && (
-        <form onSubmit={handlePlaceBid} className="card p-5 space-y-3">
-          <p className="font-bold">💬 Place Your Bid</p>
+        <form onSubmit={handlePlaceBid} className="card p-6 space-y-3">
+          <p className="font-display font-semibold">💬 Place your bid</p>
           <div className="flex gap-2">
             <input
               type="number"
@@ -381,14 +388,14 @@ export function TaskDetailsPage() {
               onChange={(e) => setBidAmount(e.target.value)}
             />
             <button type="submit" disabled={submittingBid} className="btn-primary shrink-0">
-              {submittingBid ? "Submitting..." : "Submit Bid"}
+              {submittingBid ? "Submitting…" : "Submit Bid"}
             </button>
           </div>
         </form>
       )}
 
       {alreadyBid && !isOwner && (
-        <div className="card p-5 text-sm text-muted">✅ You've already placed a bid on this task.</div>
+        <div className="card p-6 text-sm text-muted">✅ You've already placed a bid on this task.</div>
       )}
 
       {showReview && (
@@ -412,30 +419,19 @@ export function TaskDetailsPage() {
             <textarea
               className="input-field resize-none"
               rows={4}
-              placeholder="Describe the problem..."
+              placeholder="Describe the problem…"
               value={disputeReason}
               onChange={(e) => setDisputeReason(e.target.value)}
             />
             <div className="flex gap-2">
-              <button type="button" onClick={() => setShowDispute(false)} className="btn-secondary flex-1">
-                Cancel
-              </button>
+              <button type="button" onClick={() => setShowDispute(false)} className="btn-secondary flex-1">Cancel</button>
               <button type="submit" disabled={submittingDispute} className="btn-primary flex-1">
-                {submittingDispute ? "Submitting..." : "Submit Dispute"}
+                {submittingDispute ? "Submitting…" : "Submit Dispute"}
               </button>
             </div>
           </form>
         </Modal>
       )}
-    </div>
-  );
-}
-
-function InfoBlock({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
-  return (
-    <div>
-      <p className="text-xs text-muted uppercase tracking-wide">{label}</p>
-      <p className={`font-semibold truncate ${accent ? "text-ink dark:text-white text-lg" : ""}`}>{value}</p>
     </div>
   );
 }

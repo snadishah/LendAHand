@@ -101,7 +101,7 @@ export function SettingsPage() {
           </div>
         )}
         {profileSuccess && (
-          <div className="rounded-xl bg-green/10 text-green text-sm px-4 py-3">✅ {profileSuccess}</div>
+          <div className="rounded-xl bg-ink/5 dark:bg-white/5 text-ink dark:text-white text-sm px-4 py-3">✅ {profileSuccess}</div>
         )}
 
         <div className="grid sm:grid-cols-2 gap-4">
@@ -142,7 +142,7 @@ export function SettingsPage() {
           </div>
         )}
         {passwordSuccess && (
-          <div className="rounded-xl bg-green/10 text-green text-sm px-4 py-3">✅ {passwordSuccess}</div>
+          <div className="rounded-xl bg-ink/5 dark:bg-white/5 text-ink dark:text-white text-sm px-4 py-3">✅ {passwordSuccess}</div>
         )}
 
         <div className="grid sm:grid-cols-3 gap-4">

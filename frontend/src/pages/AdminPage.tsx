@@ -237,7 +237,7 @@ function Users({ onError }: { onError: (m: string | null) => void }) {
             <div key={u.id} className="card p-4 flex items-center justify-between gap-3">
               <div className="min-w-0">
                 <p className="font-semibold truncate">
-                  {u.name} {u.isAdmin && <span className="chip bg-purple/10 text-purple ml-1">Admin</span>}
+                  {u.name} {u.isAdmin && <span className="chip bg-ink/10 dark:bg-white/15 text-ink dark:text-white ml-1">Admin</span>}
                   {u.isBanned && <span className="chip bg-red-100 text-red-500 ml-1">Banned</span>}
                 </p>
                 <p className="text-xs text-muted truncate">

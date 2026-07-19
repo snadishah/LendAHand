@@ -34,7 +34,7 @@ export function BidCard({ bid, disabled, onAccept, accepting }: BidCardProps) {
           {accepting ? "Accepting..." : "Accept"}
         </button>
       ) : (
-        <span className={`text-sm font-semibold shrink-0 ${bid.status === "ACCEPTED" ? "text-green" : "text-muted"}`}>
+        <span className={`text-sm font-semibold shrink-0 ${bid.status === "ACCEPTED" ? "text-ink dark:text-white" : "text-muted"}`}>
           {STATUS_LABEL[bid.status]}
         </span>
       )}

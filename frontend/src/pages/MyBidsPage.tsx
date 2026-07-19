@@ -51,10 +51,10 @@ function HelperBidsView() {
                 <span
                   className={`text-xs font-bold px-2 py-1 rounded-full ${
                     bid.status === "ACCEPTED"
-                      ? "bg-green/15 text-green"
+                      ? "bg-ink text-paper dark:bg-white dark:text-ink"
                       : bid.status === "REJECTED"
                       ? "bg-slate-200 text-slate-500 dark:bg-[#242424] dark:text-[#B8B5AC]"
-                      : "bg-yellow/25 text-[#946200] dark:text-yellow"
+                      : "border border-ink/25 dark:border-white/25 text-ink dark:text-white"
                   }`}
                 >
                   {bid.status}

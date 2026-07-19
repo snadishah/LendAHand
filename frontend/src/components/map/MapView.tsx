@@ -6,13 +6,15 @@ import type { Task, TaskStatus } from "../../types";
 
 const DEFAULT_CENTER: [number, number] = [31.5204, 74.3587]; // Lahore
 
+// Map pins are a deliberate exception to the monochrome UI: status needs to be
+// distinguishable at a glance, so each state gets a clear, conventional colour.
 const STATUS_COLOR: Record<TaskStatus, string> = {
-  OPEN: "#0A0A0A",
-  IN_PROGRESS: "#595959",
-  SUBMITTED: "#2E2E2E",
-  DONE: "#AEAAA1",
-  CANCELLED: "#D0CDC4",
-  DISPUTED: "#7A756B",
+  OPEN: "#16A34A", // green — available
+  IN_PROGRESS: "#F59E0B", // amber — being worked on
+  SUBMITTED: "#2563EB", // blue — awaiting confirmation
+  DONE: "#6B7280", // gray — complete
+  CANCELLED: "#DC2626", // red — cancelled
+  DISPUTED: "#EA580C", // orange — disputed
 };
 
 function pinIcon(color: string) {

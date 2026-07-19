@@ -21,10 +21,10 @@ export function VerifyEmailBanner() {
   }
 
   return (
-    <div className="bg-yellow/20 border-b border-yellow/40 text-sm px-4 sm:px-6 py-2.5 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-center">
+    <div className="bg-ink/5 dark:bg-white/5 border-b border-ink/15 dark:border-white/15 text-sm px-4 sm:px-6 py-2.5 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-center">
       <span>✉️ Please verify your email address to secure your account.</span>
       {sent ? (
-        <span className="font-semibold text-green">Verification email sent — check your inbox.</span>
+        <span className="font-semibold text-ink dark:text-white">Verification email sent — check your inbox.</span>
       ) : (
         <button onClick={resend} disabled={sending} className="font-semibold text-ink dark:text-white hover:underline">
           {sending ? "Sending…" : "Resend email"}

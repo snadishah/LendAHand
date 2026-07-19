@@ -70,7 +70,7 @@ export function Navbar() {
       <div className="flex items-center gap-2 sm:gap-3">
         <Link
           to="/wallet"
-          className="flex items-center gap-1.5 rounded-full bg-green/10 text-green font-bold px-3 py-1.5 text-sm hover:bg-green/20 transition-colors"
+          className="flex items-center gap-1.5 rounded-full bg-ink/5 dark:bg-white/5 text-ink dark:text-white font-bold px-3 py-1.5 text-sm hover:bg-ink/15 dark:hover:bg-white/20 transition-colors"
         >
           💰 Rs. {user?.walletBalance.toFixed(0)}
         </Link>
