@@ -1,6 +1,6 @@
 # LendAHand — Web
 
-A full-stack rebuild of the original JavaFX **LendAHand** desktop app: a community task marketplace where **Task Posters** hire **Helpers** for small gigs, with an in-app wallet, escrow, bidding, reviews, a live map, and an AI assistant.
+**LendAHand** is a full-stack community task marketplace where **Task Posters** hire **Helpers** for small gigs — with an in-app wallet, escrow, bidding, two-way reviews, a live map, and an AI assistant.
 
 ## Tech stack
 
@@ -54,16 +54,16 @@ Note: Render's free web services spin down after ~15 minutes of inactivity and t
 
 `railway.toml` is still included if you'd rather deploy to Railway instead (its own free trial credit eventually runs out, unlike Render/Neon's free tiers).
 
-## What changed vs. the original JavaFX app
+## Features
 
-The original app is untouched at `../LendAHand`. This rewrite replicates every feature (auth, posting, bidding, escrow, reviews, wallet, map, AI estimate/chat, dark mode) and fixes several real bugs found while reading the original source:
-
-- **Plaintext passwords** → bcrypt hashing.
-- **Hardcoded Gemini API key in source** → read from a gitignored `.env`, server-side only.
-- **`wallet_transactions` table referenced but never created** → a first-class `WalletTransaction` model, written atomically with every balance change.
-- **Dead `notifications` table** (created, never used) → fully wired: bid received, bid accepted/rejected, task completed.
-- **Non-atomic bid acceptance** (task status, bid status, and wallet deduction were separate un-transacted steps) → every money-moving action (`acceptBid`, `markDone`, `cancel`, `deposit`, `withdraw`) is now a single Prisma `$transaction`.
-- **Fragile runtime dark-mode hack** (regex-replacing inline hex colors) → a proper Tailwind `dark:` class-based theme.
+- **Auth** — JWT in an httpOnly cookie, bcrypt-hashed passwords.
+- **Post & bid** — post a task with a budget; helpers bid, and posters accept the best offer.
+- **Escrow wallet** — accepting a bid holds the funds in escrow, released to the helper on confirmation, with a dispute path and an auto-release safety net. Every balance change is a single atomic Prisma `$transaction`.
+- **Two-way reviews & ratings** — posters and helpers rate each other.
+- **Live map** — server-side geocoding places tasks on a Leaflet / OpenStreetMap map, sortable by distance.
+- **Admin console** — moderate tasks, settle disputes, and ban users.
+- **AI assistant** — Gemini-powered price estimates and a chat helper.
+- **Light / dark mode** — a class-based Tailwind theme.
 
 ## Project structure
 
