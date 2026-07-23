@@ -1,0 +1,33 @@
+# Fly.io deployment config for LendAHand.
+# The app container (built from Dockerfile) serves both the API and the built
+# frontend from one process; the database stays on Neon (external).
+#
+# Region note: primary_region is set next to the Neon us-east-1 database so the
+# multi-query actions (accepting a bid, resolving a dispute) stay fast. Change
+# it only if you also move the database's region.
+
+app = "lendahand"          # must be globally unique — rename if taken
+primary_region = "iad"     # Ashburn, VA — co-located with Neon us-east-1
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  NODE_ENV = "production"
+  PORT = "3000"
+
+[http_service]
+  internal_port = 3000
+  force_https = true
+  auto_stop_machines = "suspend"   # suspend idle extra machines
+  auto_start_machines = true
+  min_machines_running = 1         # keep 1 always-on (no cold starts); set 0 to save money
+
+  [http_service.concurrency]
+    type = "requests"
+    soft_limit = 200
+    hard_limit = 250
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "512mb"
