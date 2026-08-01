@@ -1,33 +1,33 @@
 import nodemailer, { type Transporter } from "nodemailer";
 import { env } from "../env.js";
 
-// Email delivery via Gmail SMTP. It's a no-op until GMAIL_USER +
-// GMAIL_APP_PASSWORD are configured, so the app runs identically in
-// development and won't break if email isn't set up yet.
-//
-// Note: Gmail free accounts cap at ~500 emails/day. When moving to a custom
-// domain later, only this file (and the env vars) need to change.
+// Email delivery via generic SMTP — works with any provider (Gmail, Outlook/
+// Hotmail, Zoho, a custom domain, …). It's a no-op until SMTP_HOST + SMTP_USER +
+// SMTP_PASS are configured, so the app runs identically in development and
+// won't break if email isn't set up yet.
 let transporter: Transporter | null = null;
 
 export function isEmailConfigured(): boolean {
-  return !!(env.GMAIL_USER && env.GMAIL_APP_PASSWORD);
+  return !!(env.SMTP_HOST && env.SMTP_USER && env.SMTP_PASS);
 }
 
 function getTransporter(): Transporter | null {
   if (!isEmailConfigured()) return null;
   if (!transporter) {
     transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: { user: env.GMAIL_USER, pass: env.GMAIL_APP_PASSWORD },
+      host: env.SMTP_HOST,
+      port: env.SMTP_PORT,
+      secure: env.SMTP_PORT === 465, // 465 = implicit TLS; 587 = STARTTLS
+      auth: { user: env.SMTP_USER, pass: env.SMTP_PASS },
     });
   }
   return transporter;
 }
 
-// Gmail requires the From address to be the authenticated account (a display
-// name is fine). Fall back to that if EMAIL_FROM isn't set.
+// Most providers require the From address to match the authenticated account
+// (a display name is fine). Fall back to that if EMAIL_FROM isn't set.
 function fromAddress(): string {
-  return env.EMAIL_FROM || `LendAHand <${env.GMAIL_USER}>`;
+  return env.EMAIL_FROM || `LendAHand <${env.SMTP_USER}>`;
 }
 
 export interface OutgoingEmail {

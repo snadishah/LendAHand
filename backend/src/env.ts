@@ -13,8 +13,11 @@ const envSchema = z.object({
     .min(16, "JWT_SECRET must be set to a long random string (at least 16 characters)"),
   GEMINI_API_KEY: z.string().optional(),
   SENTRY_DSN: z.string().url().optional(),
-  GMAIL_USER: z.string().optional(),
-  GMAIL_APP_PASSWORD: z.string().optional(),
+  // Generic SMTP — works with Gmail, Outlook/Hotmail, Zoho, a custom domain, etc.
+  SMTP_HOST: z.string().optional(),
+  SMTP_PORT: z.coerce.number().int().positive().default(587),
+  SMTP_USER: z.string().optional(),
+  SMTP_PASS: z.string().optional(),
   EMAIL_FROM: z.string().optional(),
   APP_URL: z.string().url().default("http://localhost:5173"),
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
