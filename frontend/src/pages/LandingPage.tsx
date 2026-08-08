@@ -1,6 +1,7 @@
 import { useState, type FormEvent, type ReactNode } from "react";
 import { Link, Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { Logo } from "../components/ui/Logo";
 
 const CATEGORIES = [
   "💪 Heavy Lifting", "📚 Tutoring", "🧹 Cleaning", "🚗 Need a Ride", "💻 Computer Help",
@@ -50,8 +51,8 @@ function Nav() {
   return (
     <header className="sticky top-0 z-50 grid grid-cols-2 sm:grid-cols-3 items-center px-5 sm:px-8 py-4 backdrop-blur bg-paper/70 dark:bg-[#0B0B0B]/70 border-b border-ink/10 dark:border-white/10">
       <div className="hidden sm:block eyebrow">Community task marketplace</div>
-      <Link to="/" className="justify-self-start sm:justify-self-center flex items-center gap-2 font-display font-bold text-lg">
-        <span className="text-2xl">🤝</span> LendAHand
+      <Link to="/" className="justify-self-start sm:justify-self-center text-lg">
+        <Logo />
       </Link>
       <div className="justify-self-end flex items-center gap-2 sm:gap-3">
         <Link to="/login" className="text-sm font-semibold hover:underline underline-offset-4">Log in</Link>
@@ -230,9 +231,7 @@ function Footer() {
   return (
     <footer className="px-5 sm:px-8 py-12 max-w-6xl mx-auto">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
-        <div className="font-display font-bold text-2xl flex items-center gap-2">
-          <span className="text-2xl">🤝</span> LendAHand
-        </div>
+        <Logo className="text-2xl" />
         <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm font-semibold">
           <FooterLink href="#top">Home</FooterLink>
           <Link to="/login" className="hover:underline underline-offset-4">Log in</Link>

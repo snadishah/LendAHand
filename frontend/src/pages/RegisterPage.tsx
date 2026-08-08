@@ -2,6 +2,7 @@ import { useState, type FormEvent, type ReactNode } from "react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { ApiError } from "../lib/api";
+import { Logo } from "../components/ui/Logo";
 import type { UserType } from "../types";
 
 export function RegisterPage() {
@@ -42,8 +43,8 @@ export function RegisterPage() {
       {/* Left — form */}
       <main className="order-2 md:order-1 flex items-center justify-center px-6 py-10 md:h-screen md:overflow-y-auto">
         <form onSubmit={handleSubmit} className="w-full max-w-md">
-          <Link to="/" className="md:hidden mb-8 flex items-center gap-2 font-display font-bold text-lg">
-            <span className="text-2xl">🤝</span> LendAHand
+          <Link to="/" className="md:hidden mb-8 inline-flex text-lg">
+            <Logo />
           </Link>
 
           <p className="eyebrow">Create account</p>
@@ -100,8 +101,8 @@ export function RegisterPage() {
       <aside className="order-1 md:order-2 relative overflow-hidden bg-ink text-paper dark:bg-white dark:text-ink flex flex-col justify-between p-8 sm:p-12 min-h-[30vh] md:min-h-screen">
         <div className="absolute -left-20 -bottom-28 text-[26rem] leading-none opacity-[0.06] select-none pointer-events-none font-display">✦</div>
 
-        <Link to="/" className="relative self-end flex items-center gap-2 font-display font-bold text-xl">
-          <span className="text-2xl">🤝</span> LendAHand
+        <Link to="/" className="relative self-end text-xl">
+          <Logo />
         </Link>
 
         <div className="relative">

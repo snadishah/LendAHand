@@ -4,6 +4,7 @@ import { useAuth } from "../../context/AuthContext";
 import { useTheme } from "../../context/ThemeContext";
 import { useNotifications } from "../../hooks/useNotifications";
 import { Avatar } from "../ui/Avatar";
+import { Logo } from "../ui/Logo";
 
 function formatRelativeTime(date: string | Date): string {
   const d = typeof date === "string" ? new Date(date) : date;
@@ -62,9 +63,9 @@ export function Navbar() {
 
   return (
     <header className="sticky top-0 z-40 flex items-center justify-between gap-4 border-b border-ink/10 dark:border-white/10 bg-paper/80 dark:bg-[#0B0B0B]/80 backdrop-blur px-4 sm:px-6 py-3">
-      <Link to="/dashboard" className="flex items-center gap-2 font-display font-bold text-lg shrink-0">
-        <span className="text-2xl">🤝</span>
-        <span className="hidden sm:inline">LendAHand</span>
+      <Link to="/dashboard" className="flex items-center gap-2 shrink-0">
+        <Logo withWordmark={false} />
+        <span className="hidden sm:inline font-display font-bold text-lg">LendAHand</span>
       </Link>
 
       <div className="flex items-center gap-2 sm:gap-3">

@@ -2,6 +2,7 @@ import { useState, type FormEvent } from "react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { ApiError } from "../lib/api";
+import { Logo } from "../components/ui/Logo";
 
 const MARQUEE = ["Heavy Lifting", "Tutoring", "Cleaning", "Rides", "Deliveries", "Pet Care", "Painting", "Repairs"];
 
@@ -36,8 +37,8 @@ export function LoginPage() {
         <div className="absolute -right-16 -top-24 text-[26rem] leading-none opacity-[0.06] select-none pointer-events-none font-display">★</div>
         <div className="absolute right-10 bottom-40 h-40 w-40 rounded-full border border-paper/20 dark:border-ink/20" />
 
-        <Link to="/" className="relative flex items-center gap-2 font-display font-bold text-xl">
-          <span className="text-2xl">🤝</span> LendAHand
+        <Link to="/" className="relative text-xl">
+          <Logo />
         </Link>
 
         <div className="relative">
@@ -66,8 +67,8 @@ export function LoginPage() {
       {/* Right — form */}
       <main className="flex items-center justify-center px-6 py-14 md:h-screen md:overflow-y-auto">
         <form onSubmit={handleSubmit} className="w-full max-w-sm">
-          <Link to="/" className="md:hidden mb-8 flex items-center gap-2 font-display font-bold text-lg">
-            <span className="text-2xl">🤝</span> LendAHand
+          <Link to="/" className="md:hidden mb-8 inline-flex text-lg">
+            <Logo />
           </Link>
 
           <p className="eyebrow">Log in</p>
