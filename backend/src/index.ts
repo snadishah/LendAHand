@@ -7,7 +7,7 @@ import { isEmailConfigured } from "./lib/email.js";
 
 app.listen(env.PORT, () => {
   console.log(`LendAHand API listening on http://localhost:${env.PORT}`);
-  console.log(`Email delivery: ${isEmailConfigured() ? "enabled" : "disabled (set SMTP_HOST/SMTP_USER/SMTP_PASS)"}`);
+  console.log(`Email delivery: ${isEmailConfigured() ? "enabled" : "disabled (set BREVO_API_KEY or SMTP_*)"}`);
 });
 
 // Safety-net sweep: release escrow on submitted tasks a poster never confirmed,

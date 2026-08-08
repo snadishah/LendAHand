@@ -13,7 +13,9 @@ const envSchema = z.object({
     .min(16, "JWT_SECRET must be set to a long random string (at least 16 characters)"),
   GEMINI_API_KEY: z.string().optional(),
   SENTRY_DSN: z.string().url().optional(),
-  // Generic SMTP — works with Gmail, Outlook/Hotmail, Zoho, a custom domain, etc.
+  // Brevo HTTP API (preferred on hosts that block outbound SMTP, e.g. Render).
+  BREVO_API_KEY: z.string().optional(),
+  // Generic SMTP fallback — works with Gmail, Outlook/Hotmail, Zoho, custom domain.
   SMTP_HOST: z.string().optional(),
   SMTP_PORT: z.coerce.number().int().positive().default(587),
   SMTP_USER: z.string().optional(),

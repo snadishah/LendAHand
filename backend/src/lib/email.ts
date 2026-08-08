@@ -1,18 +1,61 @@
 import nodemailer, { type Transporter } from "nodemailer";
 import { env } from "../env.js";
 
-// Email delivery via generic SMTP — works with any provider (Gmail, Outlook/
-// Hotmail, Zoho, a custom domain, …). It's a no-op until SMTP_HOST + SMTP_USER +
-// SMTP_PASS are configured, so the app runs identically in development and
-// won't break if email isn't set up yet.
-let transporter: Transporter | null = null;
+// Email delivery with two transports:
+//   1. Brevo HTTP API (over HTTPS/443) — preferred, because many hosts (Render,
+//      etc.) block outbound SMTP ports. Used when BREVO_API_KEY is set.
+//   2. Generic SMTP (nodemailer) — fallback for local dev or other providers.
+// It's a no-op until one of them is configured, so the app runs fine without email.
 
 export function isEmailConfigured(): boolean {
-  return !!(env.SMTP_HOST && env.SMTP_USER && env.SMTP_PASS);
+  return !!(env.BREVO_API_KEY || (env.SMTP_HOST && env.SMTP_USER && env.SMTP_PASS));
 }
 
+export interface OutgoingEmail {
+  to: string;
+  subject: string;
+  html: string;
+  text?: string;
+}
+
+// Parse EMAIL_FROM ("LendAHand <addr@x.com>" or "addr@x.com") into name + email.
+function parseFrom(): { name: string; email: string } {
+  const raw = env.EMAIL_FROM || env.SMTP_USER || "";
+  const m = raw.match(/^\s*(.*?)\s*<([^>]+)>\s*$/);
+  if (m) return { name: m[1] || "LendAHand", email: m[2] };
+  return { name: "LendAHand", email: raw };
+}
+
+async function sendViaBrevoApi(email: OutgoingEmail): Promise<{ ok: boolean; error?: string }> {
+  try {
+    const res = await fetch("https://api.brevo.com/v3/smtp/email", {
+      method: "POST",
+      headers: {
+        "api-key": env.BREVO_API_KEY as string,
+        "Content-Type": "application/json",
+        accept: "application/json",
+      },
+      body: JSON.stringify({
+        sender: parseFrom(),
+        to: [{ email: email.to }],
+        subject: email.subject,
+        htmlContent: email.html,
+        textContent: email.text,
+      }),
+    });
+    if (!res.ok) {
+      const body = await res.text().catch(() => "");
+      return { ok: false, error: `Brevo API ${res.status}: ${body.slice(0, 200)}` };
+    }
+    return { ok: true };
+  } catch (err) {
+    return { ok: false, error: err instanceof Error ? err.message : "Brevo API error" };
+  }
+}
+
+let transporter: Transporter | null = null;
 function getTransporter(): Transporter | null {
-  if (!isEmailConfigured()) return null;
+  if (!(env.SMTP_HOST && env.SMTP_USER && env.SMTP_PASS)) return null;
   if (!transporter) {
     transporter = nodemailer.createTransport({
       host: env.SMTP_HOST,
@@ -24,26 +67,12 @@ function getTransporter(): Transporter | null {
   return transporter;
 }
 
-// Most providers require the From address to match the authenticated account
-// (a display name is fine). Fall back to that if EMAIL_FROM isn't set.
-function fromAddress(): string {
-  return env.EMAIL_FROM || `LendAHand <${env.SMTP_USER}>`;
-}
-
-export interface OutgoingEmail {
-  to: string;
-  subject: string;
-  html: string;
-  text?: string;
-}
-
-export async function sendEmail(email: OutgoingEmail): Promise<{ ok: boolean; error?: string }> {
+async function sendViaSmtp(email: OutgoingEmail): Promise<{ ok: boolean; error?: string }> {
   const tx = getTransporter();
   if (!tx) return { ok: false, error: "Email not configured" };
-
   try {
     await tx.sendMail({
-      from: fromAddress(),
+      from: env.EMAIL_FROM || `LendAHand <${env.SMTP_USER}>`,
       to: email.to,
       subject: email.subject,
       html: email.html,
@@ -53,4 +82,10 @@ export async function sendEmail(email: OutgoingEmail): Promise<{ ok: boolean; er
   } catch (err) {
     return { ok: false, error: err instanceof Error ? err.message : "Unknown email error" };
   }
+}
+
+export async function sendEmail(email: OutgoingEmail): Promise<{ ok: boolean; error?: string }> {
+  // Prefer the HTTP API when available (works on hosts that block SMTP ports).
+  if (env.BREVO_API_KEY) return sendViaBrevoApi(email);
+  return sendViaSmtp(email);
 }
