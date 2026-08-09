@@ -31,7 +31,9 @@ async function sendSignupEmails(userId: number, name: string, userType: UserType
 
 const router = Router();
 
-const STARTING_BALANCE = { POSTER: 200, HELPER: 50 } as const;
+// Deposits are disabled for now, so new accounts get a generous demo balance
+// to actually try posting + hiring (escrow) end to end.
+const STARTING_BALANCE = { POSTER: 5000, HELPER: 1000 } as const;
 
 const registerSchema = z.object({
   name: z.string().min(3),

@@ -52,7 +52,7 @@ export function PostTaskPage() {
     const budgetNum = Number(budget);
     if (!budgetNum || budgetNum <= 0) return setError("Enter a valid budget.");
     if (user && budgetNum > user.walletBalance) {
-      setError(`Your budget (Rs. ${budgetNum}) is higher than your wallet balance (Rs. ${user.walletBalance.toFixed(0)}). You can still post — you'll need to top up before accepting a bid.`);
+      setError(`Heads up: your budget (Rs. ${budgetNum}) is higher than your wallet balance (Rs. ${user.walletBalance.toFixed(0)}). You can still post, but you'll need enough balance to accept a bid.`);
     }
 
     setSubmitting(true);

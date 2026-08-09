@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useState, type FormEvent } from "react";
-import { apiGet, apiPost, ApiError } from "../lib/api";
+import { useCallback, useEffect, useState } from "react";
+import { apiGet } from "../lib/api";
 import { useAuth } from "../context/AuthContext";
 import type { WalletTransaction, WalletTxType } from "../types";
 import { Spinner, EmptyState } from "../components/ui/EmptyState";
@@ -13,14 +13,10 @@ const TX_LABEL: Record<WalletTxType, { label: string; icon: string; sign: "+" | 
 };
 
 export function WalletPage() {
-  const { user, refreshUser } = useAuth();
+  const { user } = useAuth();
   const [balance, setBalance] = useState<number | null>(null);
   const [transactions, setTransactions] = useState<WalletTransaction[]>([]);
   const [loading, setLoading] = useState(true);
-  const [tab, setTab] = useState<"deposit" | "withdraw">("deposit");
-  const [amount, setAmount] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [submitting, setSubmitting] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -34,23 +30,6 @@ export function WalletPage() {
     load();
   }, [load]);
 
-  async function handleSubmit(e: FormEvent) {
-    e.preventDefault();
-    setError(null);
-    const amt = Number(amount);
-    if (!amt || amt <= 0) return setError("Enter a valid amount.");
-    setSubmitting(true);
-    try {
-      await apiPost(`/wallet/${tab}`, { amount: amt });
-      await Promise.all([load(), refreshUser()]);
-      setAmount("");
-    } catch (err) {
-      setError(err instanceof ApiError ? err.message : "Something went wrong.");
-    } finally {
-      setSubmitting(false);
-    }
-  }
-
   return (
     <div className="space-y-6 max-w-4xl">
       {/* Balance statement */}
@@ -61,89 +40,53 @@ export function WalletPage() {
           Rs. {(balance ?? user?.walletBalance ?? 0).toFixed(0)}
         </p>
         <p className="mt-4 text-paper/60 dark:text-ink/60 text-sm max-w-md">
-          Add funds to hire helpers, and cash out what you earn. Money in active tasks is held safely in escrow.
+          Money for active tasks is held safely in escrow and released to your helper once the work is confirmed.
         </p>
       </section>
 
-      <div className="grid md:grid-cols-2 gap-6 items-stretch">
-        {/* Deposit / Withdraw */}
-        <form onSubmit={handleSubmit} className="card p-6 flex flex-col gap-4">
-          <div className="inline-flex w-full rounded-full border border-ink/12 dark:border-white/15 p-1">
-            {(["deposit", "withdraw"] as const).map((t) => (
-              <button
-                key={t}
-                type="button"
-                onClick={() => setTab(t)}
-                className={`flex-1 rounded-full px-4 py-1.5 text-sm font-semibold capitalize transition-colors ${
-                  tab === t ? "bg-ink text-paper dark:bg-white dark:text-ink" : "text-muted"
-                }`}
-              >
-                {t}
-              </button>
-            ))}
-          </div>
-
-          {error && (
-            <div className="rounded-xl border border-red-300 dark:border-red-900/60 bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400 text-sm px-4 py-3">
-              {error}
-            </div>
-          )}
-
-          <div>
-            <label className="text-sm font-semibold mb-1.5 block">Amount (Rs.)</label>
-            <input type="number" min="1" required className="input-field text-lg" placeholder="0" value={amount} onChange={(e) => setAmount(e.target.value)} />
-          </div>
-
-          <div className="grid grid-cols-4 gap-2">
-            {[100, 500, 1000, 5000].map((q) => (
-              <button
-                key={q}
-                type="button"
-                onClick={() => setAmount(String(q))}
-                className="rounded-full border border-ink/15 dark:border-white/20 py-2 text-sm font-semibold hover:bg-ink hover:text-paper dark:hover:bg-white dark:hover:text-ink transition-colors"
-              >
-                {q}
-              </button>
-            ))}
-          </div>
-
-          <button type="submit" disabled={submitting} className="btn-primary w-full !py-3 mt-auto">
-            {submitting ? "Processing…" : tab === "deposit" ? "Add Funds" : "Withdraw"}
-          </button>
-        </form>
-
-        {/* History */}
-        <div className="card p-6 flex flex-col">
-          <p className="font-display font-semibold text-lg mb-4">Transaction history</p>
-          {loading ? (
-            <Spinner />
-          ) : transactions.length === 0 ? (
-            <EmptyState emoji="💳" title="No transactions yet" />
-          ) : (
-            <ul className="divide-y divide-ink/8 dark:divide-white/10 -my-2 max-h-[420px] overflow-y-auto">
-              {transactions.map((tx) => {
-                const meta = TX_LABEL[tx.type];
-                const positive = meta.sign === "+";
-                return (
-                  <li key={tx.id} className="py-3.5 flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-3 min-w-0">
-                      <span className={`h-9 w-9 shrink-0 rounded-full grid place-items-center text-sm font-bold ${positive ? "bg-ink text-paper dark:bg-white dark:text-ink" : "border border-ink/20 dark:border-white/20"}`}>
-                        {meta.icon}
-                      </span>
-                      <div className="min-w-0">
-                        <p className="font-semibold text-sm">{meta.label}</p>
-                        <p className="text-xs text-muted truncate">{tx.note}</p>
-                      </div>
-                    </div>
-                    <span className="font-display font-bold tabular-nums shrink-0">
-                      {meta.sign} Rs. {tx.amount.toFixed(0)}
-                    </span>
-                  </li>
-                );
-              })}
-            </ul>
-          )}
+      {/* Coming-soon note */}
+      <div className="card p-5 flex items-start gap-3">
+        <span className="text-xl">🏦</span>
+        <div>
+          <p className="font-display font-semibold">Deposits &amp; withdrawals — coming soon</p>
+          <p className="text-sm text-muted mt-0.5">
+            Real top-ups and cash-outs will arrive once payments are integrated. For now, your balance moves
+            automatically as you post, hire, and complete tasks.
+          </p>
         </div>
+      </div>
+
+      {/* History */}
+      <div className="card p-6">
+        <p className="font-display font-semibold text-lg mb-4">Transaction history</p>
+        {loading ? (
+          <Spinner />
+        ) : transactions.length === 0 ? (
+          <EmptyState emoji="💳" title="No transactions yet" />
+        ) : (
+          <ul className="divide-y divide-ink/8 dark:divide-white/10 -my-2">
+            {transactions.map((tx) => {
+              const meta = TX_LABEL[tx.type];
+              const positive = meta.sign === "+";
+              return (
+                <li key={tx.id} className="py-3.5 flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <span className={`h-9 w-9 shrink-0 rounded-full grid place-items-center text-sm font-bold ${positive ? "bg-ink text-paper dark:bg-white dark:text-ink" : "border border-ink/20 dark:border-white/20"}`}>
+                      {meta.icon}
+                    </span>
+                    <div className="min-w-0">
+                      <p className="font-semibold text-sm">{meta.label}</p>
+                      <p className="text-xs text-muted truncate">{tx.note}</p>
+                    </div>
+                  </div>
+                  <span className="font-display font-bold tabular-nums shrink-0">
+                    {meta.sign} Rs. {tx.amount.toFixed(0)}
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+        )}
       </div>
     </div>
   );

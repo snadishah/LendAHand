@@ -1,12 +1,10 @@
 import { Router } from "express";
-import { z } from "zod";
 import { asyncHandler } from "../lib/asyncHandler.js";
 import { requireAuth } from "../middleware/auth.js";
-import { getWalletSummary, deposit, withdraw } from "../services/wallet.service.js";
+import { HttpError } from "../lib/httpError.js";
+import { getWalletSummary } from "../services/wallet.service.js";
 
 const router = Router();
-
-const amountSchema = z.object({ amount: z.number().positive() });
 
 router.get(
   "/",
@@ -17,24 +15,13 @@ router.get(
   })
 );
 
-router.post(
-  "/deposit",
-  requireAuth,
-  asyncHandler(async (req, res) => {
-    const { amount } = amountSchema.parse(req.body);
-    const user = await deposit(req.user!.id, amount);
-    res.json({ balance: user.walletBalance });
-  })
-);
-
-router.post(
-  "/withdraw",
-  requireAuth,
-  asyncHandler(async (req, res) => {
-    const { amount } = amountSchema.parse(req.body);
-    const user = await withdraw(req.user!.id, amount);
-    res.json({ balance: user.walletBalance });
-  })
-);
+// Deposits & withdrawals are disabled until a real payment gateway is wired up.
+// Returned as explicit 403s so no one can mint balance via the API directly.
+// (The deposit/withdraw services still exist in wallet.service.ts for re-enable.)
+const notAvailable = asyncHandler(async () => {
+  throw new HttpError(403, "Deposits and withdrawals aren't available yet — coming soon.");
+});
+router.post("/deposit", requireAuth, notAvailable);
+router.post("/withdraw", requireAuth, notAvailable);
 
 export default router;
