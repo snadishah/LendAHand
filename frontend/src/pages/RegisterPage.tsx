@@ -54,8 +54,8 @@ export function RegisterPage() {
           <p className="text-muted mt-2">How do you want to use LendAHand?</p>
 
           <div className="mt-4 grid grid-cols-2 gap-3">
-            <RolePick icon="🧑‍💼" label="Post Tasks" bonus="Rs. 200 to start" selected={userType === "POSTER"} onClick={() => setUserType("POSTER")} />
-            <RolePick icon="🦺" label="Help & Earn" bonus="Rs. 50 to start" selected={userType === "HELPER"} onClick={() => setUserType("HELPER")} />
+            <RolePick icon="🧑‍💼" label="Post Tasks" bonus="Rs. 5,000 to start" selected={userType === "POSTER"} onClick={() => setUserType("POSTER")} />
+            <RolePick icon="🦺" label="Help & Earn" bonus="Rs. 1,000 to start" selected={userType === "HELPER"} onClick={() => setUserType("HELPER")} />
           </div>
 
           {error && (
@@ -116,7 +116,7 @@ export function RegisterPage() {
           <div className="mt-8 space-y-4 max-w-sm">
             <Perk n="01" t="Post a task or bid to help" d="Two ways to use it — switch whenever you like." />
             <Perk n="02" t="Escrow on every job" d="Money is safe until the work is confirmed done." />
-            <Perk n="03" t="Get paid to your wallet" d="Cash out your earnings whenever you want." />
+            <Perk n="03" t="Get paid to your wallet" d="Earnings land safely in your in-app wallet." />
           </div>
         </div>
 
