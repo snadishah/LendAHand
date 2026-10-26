@@ -1,6 +1,10 @@
-# LendAHand — Web
+# LendAHand
 
-**LendAHand** is a full-stack community task marketplace where **Task Posters** hire **Helpers** for small gigs — with an in-app wallet, escrow, bidding, two-way reviews, a live map, and an AI assistant.
+**LendAHand** is a full-stack community task marketplace where **Task Posters** hire **Helpers** for small gigs, with an in-app wallet, escrow, bidding, two-way reviews, a live map, and an AI assistant.
+
+🔗 **Live:** [lendahand-vzv6.onrender.com](https://lendahand-vzv6.onrender.com) · 🖥️ **Original desktop version:** [lendahand-desktop](https://github.com/snadishah/lendahand-desktop) (JavaFX)
+
+> Hosted on Render's free tier, so the first load can take ~30s while the container wakes up.
 
 ## Tech stack
 
